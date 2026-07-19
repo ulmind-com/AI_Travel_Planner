@@ -1,0 +1,41 @@
+# ── Dependencies ────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ── Build outputs ───────────────────────────────
+Backend/dist/
+frontend/dist/
+**/build/
+**/.gradle/
+
+# ── Env & secrets (NEVER commit) ────────────────
+.env
+.env.*
+!.env.sample
+!.env.example
+*firebase-adminsdk*.json
+adventurenexus-*.json
+*.keystore
+!debug.keystore
+
+# ── Logs ────────────────────────────────────────
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── OS / editors ────────────────────────────────
+.DS_Store
+**/.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# ── React Native / Metro ────────────────────────
+AI_Travel_Planner_Mobile/.bundle
+**/.expo/
+.metro-health-check*
+
+# ── Coverage ────────────────────────────────────
+coverage/

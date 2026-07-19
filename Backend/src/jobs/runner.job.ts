@@ -1,0 +1,28 @@
+import cron from "node-cron";
+import logger from "../shared/utils/logger";
+import { rebuildAllPendingProfiles } from "../shared/services/digitalTwinEngine";
+
+/**
+ * Simple Runner Job for testing Cron functionality.
+ * Runs every 10 seconds to indicate the scheduler is active.
+ */
+const runnerCronJob = async () => {
+    try {
+        logger.info(`Runner is running...`);
+    } catch (error) {
+        logger.error("Failed to run runner cron job...");
+    }
+}
+
+cron.schedule("*/10 * * * * *", runnerCronJob, { timezone: "Asia/Kolkata" });
+
+// Rebuild user preference profiles for Digital Twin every 5 minutes
+cron.schedule("*/5 * * * *", async () => {
+    try {
+        await rebuildAllPendingProfiles();
+    } catch (error) {
+        logger.error("Error in digital twin background profile rebuilder job:", error);
+    }
+}, { timezone: "Asia/Kolkata" });
+
+export default runnerCronJob;
