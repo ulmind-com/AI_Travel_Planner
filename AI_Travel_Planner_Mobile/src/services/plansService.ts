@@ -1,9 +1,13 @@
 import api from '../lib/api';
 import type { Plan, PlanSearchInput } from '../types/plan';
 
-/** Generate AI travel plans for the given search input. */
+/**
+ * Generate AI travel plans for the given search input.
+ * Uses a long timeout: AI generation + per-plan image fetching, plus a Render
+ * cold start, can take well over the default 20s.
+ */
 export async function searchDestination(input: PlanSearchInput): Promise<Plan[]> {
-  const { data } = await api.post('/plans/search/destination', input);
+  const { data } = await api.post('/plans/search/destination', input, { timeout: 120000 });
   return (data?.data ?? []) as Plan[];
 }
 
