@@ -15,6 +15,10 @@ import { FriendsScreen } from '../screens/social/FriendsScreen';
 import { NotificationsScreen } from '../screens/social/NotificationsScreen';
 import { ConversationsScreen } from '../screens/messaging/ConversationsScreen';
 import { ChatScreen } from '../screens/messaging/ChatScreen';
+import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
+import { SafetyScreen } from '../screens/safety/SafetyScreen';
+import { TrainsScreen } from '../screens/trains/TrainsScreen';
+import { ExpensesScreen } from '../screens/expenses/ExpensesScreen';
 import type { MainStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -49,6 +53,14 @@ export function MainNavigator() {
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen name="Conversations" component={ConversationsScreen} />
       <Stack.Screen name="Chat" component={ChatScreen} />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen name="Safety" component={SafetyScreen} />
+      <Stack.Screen name="Trains" component={TrainsScreen} />
+      <Stack.Screen name="Expenses" component={ExpensesScreen} />
     </Stack.Navigator>
   );
 }

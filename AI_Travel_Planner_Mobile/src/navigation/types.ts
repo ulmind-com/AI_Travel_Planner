@@ -34,6 +34,10 @@ export type MainStackParamList = {
   Notifications: undefined;
   Conversations: undefined;
   Chat: { conversationId: string; title?: string };
+  EditProfile: undefined;
+  Safety: undefined;
+  Trains: undefined;
+  Expenses: undefined;
 };
 
 export type RootStackParamList = {
