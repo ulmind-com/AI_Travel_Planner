@@ -2,6 +2,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { Plan, PlanSearchInput } from '../types/plan';
+import type { CommunityPost } from '../types/community';
 
 export type AuthStackParamList = {
   Onboarding: undefined;
@@ -12,6 +13,7 @@ export type AuthStackParamList = {
 export type TabParamList = {
   Home: undefined;
   Explore: undefined;
+  Community: undefined;
   Trips: undefined;
   Profile: undefined;
 };
@@ -21,6 +23,10 @@ export type MainStackParamList = {
   Planner: { prefillTo?: string } | undefined;
   PlanResults: { input: PlanSearchInput };
   PlanDetail: { plan: Plan };
+  AIChat: undefined;
+  PostDetail: { post: CommunityPost };
+  CreatePost: undefined;
+  Groups: undefined;
 };
 
 export type RootStackParamList = {

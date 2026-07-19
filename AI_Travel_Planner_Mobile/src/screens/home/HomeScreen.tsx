@@ -34,6 +34,7 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
   const month = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
 
   const openPlanner = (prefillTo?: string) => navigation.navigate('Planner', { prefillTo });
+  const openChat = () => navigation.navigate('AIChat');
 
   return (
     <View style={styles.root}>
@@ -64,13 +65,13 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
             <IconTile bg={colors.purpleSoft} icon={<Sparkles size={22} color={colors.purple} />} onPress={() => openPlanner()} />
           </View>
 
-          {/* Ask AI */}
-          <Pressable style={styles.askWrap} onPress={() => openPlanner()}>
+          {/* Ask AI — opens the conversational assistant */}
+          <Pressable style={styles.askWrap} onPress={openChat}>
             <View style={styles.askIcon}>
               <Sparkles size={18} color={colors.white} />
             </View>
             <AppText variant="body" color={colors.ink400} style={{ flex: 1 }}>
-              Ask AI to plan your trip…
+              Ask AI anything about travel…
             </AppText>
           </Pressable>
 

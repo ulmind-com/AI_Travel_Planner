@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Compass, Home, MapPinned, User } from 'lucide-react-native';
+import { Compass, Home, MapPinned, User, Users } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { shadow } from '../theme';
 import { AppText } from '../components/ui/AppText';
@@ -10,6 +10,7 @@ import { AppText } from '../components/ui/AppText';
 const ICONS: Record<string, any> = {
   Home,
   Explore: Compass,
+  Community: Users,
   Trips: MapPinned,
   Profile: User,
 };
