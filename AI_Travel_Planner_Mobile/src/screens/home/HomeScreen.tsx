@@ -17,6 +17,7 @@ import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { FEATURED, INSPIRE } from './homeData';
+import type { TabScreenProps } from '../../navigation/types';
 
 const FILTERS = [
   { key: 'timeline', label: 'Timeline', icon: <CalendarDays size={18} color={colors.green} /> },
@@ -24,13 +25,15 @@ const FILTERS = [
   { key: 'budget', label: 'Budget', icon: <DollarSign size={18} color={colors.brand} /> },
 ];
 
-export function HomeScreen() {
+export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
   const { profile, firebaseUser } = useAuth();
   const [filter, setFilter] = useState('timeline');
 
   const name =
     profile?.username || firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'Traveler';
   const month = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  const openPlanner = (prefillTo?: string) => navigation.navigate('Planner', { prefillTo });
 
   return (
     <View style={styles.root}>
@@ -55,14 +58,14 @@ export function HomeScreen() {
 
           {/* Category tiles */}
           <View style={styles.tiles}>
-            <IconTile bg={colors.greenSoft} icon={<Plane size={22} color={colors.green} />} />
-            <IconTile bg={colors.coralSoft} icon={<Hotel size={22} color={colors.coral} />} />
-            <IconTile bg={colors.blueChipSoft} icon={<Car size={22} color={colors.blueChip} />} />
-            <IconTile bg={colors.purpleSoft} icon={<Sparkles size={22} color={colors.purple} />} />
+            <IconTile bg={colors.greenSoft} icon={<Plane size={22} color={colors.green} />} onPress={() => openPlanner()} />
+            <IconTile bg={colors.coralSoft} icon={<Hotel size={22} color={colors.coral} />} onPress={() => openPlanner()} />
+            <IconTile bg={colors.blueChipSoft} icon={<Car size={22} color={colors.blueChip} />} onPress={() => openPlanner()} />
+            <IconTile bg={colors.purpleSoft} icon={<Sparkles size={22} color={colors.purple} />} onPress={() => openPlanner()} />
           </View>
 
           {/* Ask AI */}
-          <Pressable style={styles.askWrap}>
+          <Pressable style={styles.askWrap} onPress={() => openPlanner()}>
             <View style={styles.askIcon}>
               <Sparkles size={18} color={colors.white} />
             </View>
@@ -89,14 +92,14 @@ export function HomeScreen() {
           </ScrollView>
 
           {/* Featured destination */}
-          <FeaturedCard />
+          <FeaturedCard onPress={() => openPlanner(FEATURED.title)} />
 
           {/* Inspire */}
           <View style={styles.sectionHead}>
             <AppText variant="h3">Inspire next adventure</AppText>
           </View>
           {INSPIRE.map(item => (
-            <InspireRow key={item.id} item={item} />
+            <InspireRow key={item.id} item={item} onPress={() => openPlanner(item.title)} />
           ))}
 
           <View style={{ height: 120 }} />
@@ -106,10 +109,10 @@ export function HomeScreen() {
   );
 }
 
-function FeaturedCard() {
+function FeaturedCard({ onPress }: { onPress?: () => void }) {
   const f = FEATURED;
   return (
-    <Pressable style={styles.featuredWrap}>
+    <Pressable style={styles.featuredWrap} onPress={onPress}>
       <LinearGradient
         colors={f.gradient}
         start={{ x: 0, y: 0 }}
@@ -141,9 +144,9 @@ function FeaturedCard() {
   );
 }
 
-function InspireRow({ item }: { item: (typeof INSPIRE)[number] }) {
+function InspireRow({ item, onPress }: { item: (typeof INSPIRE)[number]; onPress?: () => void }) {
   return (
-    <Card onPress={() => {}} style={styles.inspire} rounded="xl">
+    <Card onPress={onPress} style={styles.inspire} rounded="xl">
       <LinearGradient colors={item.gradient} style={styles.inspireThumb}>
         <AppText variant="h2">{item.emoji}</AppText>
       </LinearGradient>

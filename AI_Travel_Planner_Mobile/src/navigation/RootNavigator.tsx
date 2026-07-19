@@ -4,7 +4,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import { useAuth } from '../context/AuthContext';
 import { AuthNavigator } from './AuthNavigator';
-import { TabNavigator } from './TabNavigator';
+import { MainNavigator } from './MainNavigator';
 import { GradientBackground } from '../components/ui';
 import { AppText } from '../components/ui/AppText';
 import { colors } from '../theme/colors';
@@ -41,7 +41,7 @@ export function RootNavigator() {
 
   return (
     <NavigationContainer theme={navTheme}>
-      {isAuthenticated ? <TabNavigator /> : <AuthNavigator />}
+      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 }

@@ -7,8 +7,8 @@
  * Render/Railway URL once the backend is live.
  */
 
-// TODO(deploy): replace with the live backend URL after deployment.
-export const API_BASE_URL = 'https://ai-travel-planner.onrender.com';
+// Live deployed backend (Render).
+export const API_BASE_URL = 'https://ai-travel-planner-0ddm.onrender.com';
 
 /** All backend routes are namespaced under /api/v1 */
 export const API_PREFIX = '/api/v1';
