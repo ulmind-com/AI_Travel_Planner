@@ -1,63 +1,71 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
-import { MapPin, Mountain, Palmtree, Search, Snowflake, Building2 } from 'lucide-react-native';
-import { AppText, Card } from '../../components/ui';
+import { useQuery } from '@tanstack/react-query';
+import { Plus, Search } from 'lucide-react-native';
+import { AppText } from '../../components/ui';
+import { ExperienceCard } from '../../components/ExperienceCard';
 import { colors } from '../../theme/colors';
-import { radius, spacing } from '../../theme';
+import { radius, shadow, spacing } from '../../theme';
+import { getExperienceFeed } from '../../services/experiencesService';
+import type { TabScreenProps } from '../../navigation/types';
 
-const CATEGORIES = [
-  { key: 'beach', label: 'Beaches', icon: Palmtree, gradient: ['#5FB0EF', '#8FCBF6'] },
-  { key: 'mountain', label: 'Mountains', icon: Mountain, gradient: ['#2FBF71', '#7CD9A6'] },
-  { key: 'city', label: 'City breaks', icon: Building2, gradient: ['#7C6CF0', '#A99BF6'] },
-  { key: 'snow', label: 'Snow & ski', icon: Snowflake, gradient: ['#3B9AE1', '#9AD0F5'] },
-];
+export function ExploreScreen({ navigation }: TabScreenProps<'Explore'>) {
+  const { data, isLoading, refetch, isRefetching } = useQuery({
+    queryKey: ['experience-feed'],
+    queryFn: getExperienceFeed,
+  });
 
-export function ExploreScreen() {
   return (
     <View style={styles.root}>
       <SafeAreaView edges={['top']} style={styles.safe}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          <AppText variant="h1" style={styles.title}>
-            Explore
-          </AppText>
-          <AppText variant="body" muted style={styles.subtitle}>
-            Find your next destination by vibe.
-          </AppText>
-
-          <View style={styles.searchBar}>
-            <Search size={20} color={colors.ink400} />
-            <AppText variant="body" color={colors.ink400}>
-              Search anywhere…
-            </AppText>
-          </View>
-
-          <View style={styles.grid}>
-            {CATEGORIES.map(c => {
-              const Icon = c.icon;
-              return (
-                <Card key={c.key} onPress={() => {}} padded={false} style={styles.tile} rounded="xl">
-                  <LinearGradient colors={c.gradient} style={styles.tileGradient}>
-                    <Icon size={26} color={colors.white} />
-                    <AppText variant="h3" color={colors.white} style={{ marginTop: 10 }}>
-                      {c.label}
-                    </AppText>
-                  </LinearGradient>
-                </Card>
-              );
-            })}
-          </View>
-
-          <Card style={styles.hint} rounded="xl">
-            <MapPin size={20} color={colors.brand} />
-            <AppText variant="body" muted style={{ flex: 1 }}>
-              Personalized picks appear here once the AI learns your travel taste.
-            </AppText>
-          </Card>
-          <View style={{ height: 120 }} />
-        </ScrollView>
+        <FlatList
+          data={data ?? []}
+          keyExtractor={item => item._id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          refreshing={isRefetching}
+          onRefresh={refetch}
+          ListHeaderComponent={
+            <View style={styles.header}>
+              <AppText variant="h1">Explore</AppText>
+              <AppText variant="body" muted style={{ marginBottom: spacing.lg }}>
+                Real experiences from travelers.
+              </AppText>
+              <Pressable
+                style={styles.search}
+                onPress={() => navigation.navigate('People')}>
+                <Search size={20} color={colors.ink400} />
+                <AppText variant="body" color={colors.ink400}>
+                  Search people & experiences…
+                </AppText>
+              </Pressable>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <ExperienceCard
+              item={item}
+              onPress={() => navigation.navigate('ExperienceDetail', { id: item._id })}
+            />
+          )}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <AppText variant="h3" center>
+                {isLoading ? 'Loading experiences…' : 'No experiences yet'}
+              </AppText>
+              {!isLoading ? (
+                <AppText variant="body" muted center style={{ marginTop: 6 }}>
+                  Share your first travel experience.
+                </AppText>
+              ) : null}
+            </View>
+          }
+        />
       </SafeAreaView>
+
+      <Pressable style={styles.fab} onPress={() => navigation.navigate('CreateExperience')}>
+        <Plus size={26} color={colors.white} />
+      </Pressable>
     </View>
   );
 }
@@ -65,10 +73,9 @@ export function ExploreScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   safe: { flex: 1 },
-  scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.sm },
-  title: { marginTop: spacing.sm },
-  subtitle: { marginBottom: spacing.xl },
-  searchBar: {
+  list: { paddingHorizontal: spacing.xl, paddingTop: spacing.sm, paddingBottom: 130 },
+  header: { marginBottom: spacing.md },
+  search: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -76,16 +83,19 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     paddingHorizontal: 16,
     height: 52,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  tile: { width: '48%', height: 130, marginBottom: spacing.lg },
-  tileGradient: { flex: 1, borderRadius: radius.xl, padding: spacing.lg, justifyContent: 'flex-end' },
-  hint: {
-    flexDirection: 'row',
+  empty: { paddingTop: spacing.huge, alignItems: 'center' },
+  fab: {
+    position: 'absolute',
+    right: spacing.xl,
+    bottom: 100,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: colors.brand,
     alignItems: 'center',
-    gap: 12,
-    backgroundColor: colors.brandSoft,
-    marginTop: spacing.sm,
+    justifyContent: 'center',
+    ...shadow.floating,
   },
 });

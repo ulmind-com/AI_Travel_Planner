@@ -27,6 +27,13 @@ export type MainStackParamList = {
   PostDetail: { post: CommunityPost };
   CreatePost: undefined;
   Groups: undefined;
+  ExperienceDetail: { id: string };
+  CreateExperience: undefined;
+  People: undefined;
+  Friends: undefined;
+  Notifications: undefined;
+  Conversations: undefined;
+  Chat: { conversationId: string; title?: string };
 };
 
 export type RootStackParamList = {

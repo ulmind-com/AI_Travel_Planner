@@ -1,4 +1,36 @@
 {
-  "name": "AITravelPlanner",
-  "displayName": "AI Travel Planner"
+  "expo": {
+    "name": "AI Travel Planner",
+    "slug": "ai-travel-planner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "aitravelplanner",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E4F3FF"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ulmind.aitravelplanner"
+    },
+    "android": {
+      "package": "com.ulmind.aitravelplanner",
+      "adaptiveIcon": {
+        "backgroundColor": "#E4F3FF",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-font", "expo-image-picker"]
+  }
 }

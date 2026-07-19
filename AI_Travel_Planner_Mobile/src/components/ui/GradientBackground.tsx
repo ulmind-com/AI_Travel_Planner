@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { Gradient as LinearGradient } from './Gradient';
 import { colors } from '../../theme/colors';
 
 interface Props {

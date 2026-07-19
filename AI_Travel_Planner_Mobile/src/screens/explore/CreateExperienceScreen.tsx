@@ -10,24 +10,28 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ImagePlus, X } from 'lucide-react-native';
+import { ImagePlus, Star, X } from 'lucide-react-native';
 import { AppText, Button, Input, SelectChip } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/typography';
 import { radius, spacing } from '../../theme';
-import { createPost } from '../../services/communityService';
+import { createExperience } from '../../services/experiencesService';
 import { pickImages, PickedImage } from '../../lib/imagePicker';
 import { apiErrorMessage } from '../../lib/api';
 import { queryClient } from '../../lib/queryClient';
 import type { MainStackScreenProps } from '../../navigation/types';
 
-const CATEGORIES = ['Story', 'Tips', 'Question', 'Guide', 'Review', 'Meetup'];
+const CROWD = ['Solo-friendly', 'Family', 'Couples', 'Groups'];
+const DIFFICULTY = ['Easy', 'Moderate', 'Challenging'];
 
-export function CreatePostScreen({ navigation }: MainStackScreenProps<'CreatePost'>) {
+export function CreateExperienceScreen({ navigation }: MainStackScreenProps<'CreateExperience'>) {
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [category, setCategory] = useState('Story');
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
   const [tags, setTags] = useState('');
+  const [rating, setRating] = useState(5);
+  const [crowd, setCrowd] = useState('Solo-friendly');
+  const [difficulty, setDifficulty] = useState('Easy');
   const [images, setImages] = useState<PickedImage[]>([]);
   const [error, setError] = useState('');
   const [posting, setPosting] = useState(false);
@@ -39,17 +43,21 @@ export function CreatePostScreen({ navigation }: MainStackScreenProps<'CreatePos
 
   const submit = async () => {
     setError('');
-    if (!content.trim()) return setError('Write something to share.');
+    if (!title.trim()) return setError('Give your experience a title.');
+    if (!description.trim()) return setError('Describe your experience.');
     setPosting(true);
     try {
-      await createPost({
-        title: title.trim() || undefined,
-        content: content.trim(),
-        category,
+      await createExperience({
+        title: title.trim(),
+        description: description.trim(),
+        location: location.trim() || undefined,
         tags: tags.trim() || undefined,
+        rating,
+        crowdType: crowd,
+        difficultyLevel: difficulty,
         images,
       });
-      queryClient.invalidateQueries({ queryKey: ['community-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['experience-feed'] });
       navigation.goBack();
     } catch (e) {
       setError(apiErrorMessage(e));
@@ -64,51 +72,64 @@ export function CreatePostScreen({ navigation }: MainStackScreenProps<'CreatePos
         <Pressable style={styles.circle} onPress={() => navigation.goBack()} hitSlop={10}>
           <X size={20} color={colors.ink700} />
         </Pressable>
-        <AppText variant="h3">New post</AppText>
+        <AppText variant="h3">Share experience</AppText>
         <View style={styles.circle} />
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          <Input
-            label="Title (optional)"
-            placeholder="A catchy title"
-            value={title}
-            onChangeText={setTitle}
-          />
+          <Input label="Title" placeholder="Sunrise trek at Mount Batur" value={title} onChangeText={setTitle} />
           <View style={{ height: spacing.lg }} />
+          <Input label="Location" placeholder="Bali, Indonesia" value={location} onChangeText={setLocation} />
+
           <AppText variant="label" color={colors.ink600} style={styles.lbl}>
-            WHAT'S ON YOUR MIND?
+            YOUR STORY
           </AppText>
           <TextInput
             style={styles.textarea}
-            placeholder="Share a travel story, tip or question…"
+            placeholder="What made this experience special?"
             placeholderTextColor={colors.ink400}
-            value={content}
-            onChangeText={setContent}
+            value={description}
+            onChangeText={setDescription}
             multiline
             selectionColor={colors.brand}
           />
 
           <AppText variant="label" color={colors.ink600} style={styles.lbl}>
-            CATEGORY
+            RATING
+          </AppText>
+          <View style={styles.starsRow}>
+            {[1, 2, 3, 4, 5].map(n => (
+              <Pressable key={n} onPress={() => setRating(n)} hitSlop={6}>
+                <Star
+                  size={32}
+                  color={colors.gold}
+                  fill={n <= rating ? colors.gold : 'transparent'}
+                />
+              </Pressable>
+            ))}
+          </View>
+
+          <AppText variant="label" color={colors.ink600} style={styles.lbl}>
+            BEST FOR
           </AppText>
           <View style={styles.wrapRow}>
-            {CATEGORIES.map(c => (
-              <SelectChip key={c} label={c} selected={category === c} onPress={() => setCategory(c)} />
+            {CROWD.map(c => (
+              <SelectChip key={c} label={c} selected={crowd === c} onPress={() => setCrowd(c)} />
+            ))}
+          </View>
+
+          <AppText variant="label" color={colors.ink600} style={styles.lbl}>
+            DIFFICULTY
+          </AppText>
+          <View style={styles.wrapRow}>
+            {DIFFICULTY.map(d => (
+              <SelectChip key={d} label={d} selected={difficulty === d} onPress={() => setDifficulty(d)} />
             ))}
           </View>
 
           <View style={{ height: spacing.lg }} />
-          <Input
-            label="Tags (comma separated)"
-            placeholder="japan, budget, solo"
-            autoCapitalize="none"
-            value={tags}
-            onChangeText={setTags}
-          />
+          <Input label="Tags (comma separated)" placeholder="trek, sunrise, nature" autoCapitalize="none" value={tags} onChangeText={setTags} />
 
           <AppText variant="label" color={colors.ink600} style={styles.lbl}>
             PHOTOS
@@ -117,9 +138,7 @@ export function CreatePostScreen({ navigation }: MainStackScreenProps<'CreatePos
             {images.map((img, i) => (
               <View key={i} style={styles.thumb}>
                 <Image source={{ uri: img.uri }} style={styles.thumbImg} />
-                <Pressable
-                  style={styles.removeThumb}
-                  onPress={() => setImages(prev => prev.filter((_, idx) => idx !== i))}>
+                <Pressable style={styles.removeThumb} onPress={() => setImages(p => p.filter((_, idx) => idx !== i))}>
                   <X size={12} color={colors.white} />
                 </Pressable>
               </View>
@@ -136,9 +155,8 @@ export function CreatePostScreen({ navigation }: MainStackScreenProps<'CreatePos
               {error}
             </AppText>
           ) : null}
-
           <View style={{ height: spacing.xl }} />
-          <Button label="Publish post" loading={posting} onPress={submit} />
+          <Button label="Share experience" loading={posting} onPress={submit} />
           <View style={{ height: spacing.xxl }} />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -167,7 +185,7 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.md },
   lbl: { marginTop: spacing.xl, marginBottom: spacing.md, marginLeft: 4, letterSpacing: 1 },
   textarea: {
-    minHeight: 130,
+    minHeight: 120,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: 16,
@@ -176,6 +194,7 @@ const styles = StyleSheet.create({
     color: colors.ink900,
     textAlignVertical: 'top',
   },
+  starsRow: { flexDirection: 'row', gap: spacing.md },
   wrapRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   imagesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   thumb: { width: 76, height: 76, borderRadius: radius.md, overflow: 'hidden' },

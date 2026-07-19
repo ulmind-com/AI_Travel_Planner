@@ -7,7 +7,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { Gradient as LinearGradient } from './Gradient';
 import { colors } from '../../theme/colors';
 import { radius, shadow } from '../../theme';
 import { AppText } from './AppText';

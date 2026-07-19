@@ -32,10 +32,10 @@ function SplashScreen() {
   );
 }
 
-export function RootNavigator() {
+export function RootNavigator({ fontsReady = true }: { fontsReady?: boolean }) {
   const { isAuthenticated, isBootstrapping } = useAuth();
 
-  if (isBootstrapping) {
+  if (isBootstrapping || !fontsReady) {
     return <SplashScreen />;
   }
 

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
+import { Gradient as LinearGradient } from '../../components/ui/Gradient';
 import {
+  Bell,
   CalendarDays,
   Car,
   DollarSign,
   Hotel,
+  MessageCircle,
   Plane,
   Route,
   Sparkles,
@@ -50,11 +52,12 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
               </AppText>
               <AppText variant="h1">Discover, {name}</AppText>
             </View>
-            <View style={styles.avatar}>
-              <AppText variant="h3" color={colors.white}>
-                {name.charAt(0).toUpperCase()}
-              </AppText>
-            </View>
+            <Pressable style={styles.headerIcon} onPress={() => navigation.navigate('Conversations')} hitSlop={6}>
+              <MessageCircle size={20} color={colors.ink700} />
+            </Pressable>
+            <Pressable style={styles.headerIcon} onPress={() => navigation.navigate('Notifications')} hitSlop={6}>
+              <Bell size={20} color={colors.ink700} />
+            </Pressable>
           </View>
 
           {/* Category tiles */}
@@ -181,16 +184,16 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.sm,
     marginBottom: spacing.xl,
   },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.brand,
+  headerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadow.sm,
   },
   tiles: {
     flexDirection: 'row',

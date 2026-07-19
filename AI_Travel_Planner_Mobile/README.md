@@ -1,71 +1,65 @@
-# AI Travel Planner — Mobile
+# AI Travel Planner — Mobile (Expo)
 
-Premium React Native app (bare CLI, RN 0.86, **new architecture**) with a
-glassmorphic UI: dreamy sky-blue gradients, frosted cards, Outfit + Inter
-type, and a floating glass tab bar.
+Premium **Expo** app (SDK 57 · React Native 0.86 · new architecture) — runs in
+**Expo Go** (scan a QR, no Android SDK / Xcode needed). Glassmorphic UI: dreamy
+sky-blue gradients, frosted cards, Outfit + Inter type, floating glass tab bar.
 
 ## Stack
 
 | Concern | Library |
 |---|---|
+| Runtime | Expo SDK 57 (Expo Go compatible) |
 | Navigation | `@react-navigation/native` · native-stack · bottom-tabs |
 | Auth | Firebase JS SDK (`firebase/auth`) + AsyncStorage persistence |
-| HTTP | `axios` (Bearer Firebase ID token, base `/api/v1`) |
-| Animation | `react-native-reanimated` v4 (+ worklets), RN `Animated` |
-| Visuals | `react-native-linear-gradient`, `react-native-svg`, `lucide-react-native`, `lottie-react-native` |
-| Storage | `@react-native-async-storage/async-storage` |
+| Data | `axios` + `@tanstack/react-query` (Bearer Firebase ID token) |
+| Animation | `react-native-reanimated` v4, RN `Animated` |
+| Visuals | `expo-linear-gradient`, `react-native-svg`, `lucide-react-native`, `lottie-react-native` |
+| Media | `expo-image-picker` · `expo-font` |
 
-## Project structure
+## Features (mapped to the backend)
+
+AI trip planner (generate → results → rich itinerary/budget detail · save) ·
+AI chat assistant · Community feed (posts, likes, comments, create w/ photos,
+groups) · Experiences feed (create, like, save) · People search + follow ·
+Friends · Notifications · Direct messaging · Expenses · Safety · Trains ·
+Profile. All against the live backend `/api/v1`.
+
+## Run in Expo Go
+
+```bash
+npm install
+npx expo start          # press "s" for Expo Go, then scan the QR
+```
+
+Install the **Expo Go** app on your phone (Play Store / App Store), scan the QR
+from `npx expo start`. That's it — no native toolchain required.
+
+## Configure
+
+Backend URL + Firebase web config live in [`src/lib/env.ts`](src/lib/env.ts).
+For a physical device, the deployed backend URL works out of the box.
+
+## Build an APK / AAB (EAS — cloud, no local Android SDK)
+
+```bash
+npm i -g eas-cli
+eas login
+eas build -p android --profile preview   # → downloadable APK
+```
+
+No local JDK/Android SDK needed — EAS builds in the cloud. (A `preview` profile
+produces an installable APK; `production` produces an AAB for the Play Store.)
+
+## Structure
 
 ```
 src/
   theme/         colors · typography · spacing/radius/shadow
-  components/ui/ AppText · Button · Input · Card · Chip · GlassCard · GradientBackground
-  lib/           env · firebase · api · authErrors
+  components/    ui kit (AppText, Button, Input, Card, Chip, Gradient, Glass…) + PlanCard, PostCard, ExperienceCard
+  lib/           env · firebase · api · queryClient · imagePicker · upload
+  services/      plans · ai · community · experiences · social · messaging (+ more)
   context/       AuthContext (Firebase <-> backend profile)
-  navigation/    RootNavigator · AuthNavigator · TabNavigator · GlassTabBar
-  screens/       auth (Onboarding/SignIn/SignUp) · home · explore · trips · profile
+  navigation/    Root · Auth · Main (stack) · Tab · GlassTabBar
+  screens/       auth · home · explore · community · planner · ai · social · messaging · trips · profile
   assets/        fonts (Outfit, Inter) · lottie
 ```
-
-## Configure
-
-Set the backend URL and Firebase web config in `src/lib/env.ts`:
-
-```ts
-export const API_BASE_URL = 'https://<your-deployed-backend>';
-```
-
-For local development against a device/emulator, use your machine's **LAN IP**
-(e.g. `http://192.168.1.5:8080`) — not `localhost`.
-
-## Run (development)
-
-```bash
-npm install
-npm start                 # Metro
-npm run android           # or: npm run ios (cd ios && pod install first)
-```
-
-## Build a release APK
-
-> **Requirements (important):**
-> - **JDK 17** — React Native's Gradle/AGP do not support newer JDKs. Point
->   `JAVA_HOME` at a 17 install (`brew install openjdk@17`).
-> - **Android SDK** (Android Studio) with `ANDROID_HOME` set and platform 35.
-
-```bash
-cd android
-./gradlew assembleRelease
-# -> android/app/build/outputs/apk/release/app-release.apk
-```
-
-Fonts are already linked (via `react-native.config.js` + `react-native-asset`).
-If you add more, drop them in `src/assets/fonts` and re-run `npx react-native-asset`.
-
-## Notes
-
-- The glass effect uses layered translucent fills (no fragile native blur
-  module) so it builds cleanly on Android + iOS new architecture.
-- Google Sign-In (native) and push notifications can be layered on later with a
-  dev build — the current build runs fully with email/password auth.

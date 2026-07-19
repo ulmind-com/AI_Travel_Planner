@@ -57,19 +57,20 @@ npm run dev
 
 ## 📱 Mobile  (`/AI_Travel_Planner_Mobile`)
 
-React Native (bare CLI, RN 0.86, new architecture) app with a premium,
-glassmorphic UI — soft sky gradients, frosted cards, Outfit + Inter typography.
-See its own [README](AI_Travel_Planner_Mobile/README.md) for setup, the design
-system, and how to build a release APK.
+**Expo** app (SDK 57, RN 0.86, new architecture) that runs in **Expo Go** —
+scan a QR, no Android SDK / Xcode needed. Premium glassmorphic UI (soft sky
+gradients, frosted cards, Outfit + Inter). Full backend feature parity: AI
+planner, AI chat, community, experiences, social, messaging, expenses, safety,
+trains, profile. See its own [README](AI_Travel_Planner_Mobile/README.md).
 
-**Stack:** React Native CLI · React Navigation · Reanimated · Firebase (JS SDK) ·
-Linear Gradient · Lottie · lucide icons · Axios.
+**Stack:** Expo · React Navigation · Reanimated · Firebase (JS SDK) · react-query ·
+expo-linear-gradient · expo-image-picker · Lottie · lucide icons · Axios.
 
 ```bash
 cd AI_Travel_Planner_Mobile
 npm install
 # set the backend URL in src/lib/env.ts
-npm run android    # or: npm run ios
+npx expo start     # press "s" for Expo Go, scan the QR
 ```
 
 ---

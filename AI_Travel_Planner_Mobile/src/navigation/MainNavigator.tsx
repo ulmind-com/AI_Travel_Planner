@@ -8,6 +8,13 @@ import { AIChatScreen } from '../screens/ai/AIChatScreen';
 import { PostDetailScreen } from '../screens/community/PostDetailScreen';
 import { CreatePostScreen } from '../screens/community/CreatePostScreen';
 import { GroupsScreen } from '../screens/community/GroupsScreen';
+import { ExperienceDetailScreen } from '../screens/explore/ExperienceDetailScreen';
+import { CreateExperienceScreen } from '../screens/explore/CreateExperienceScreen';
+import { PeopleScreen } from '../screens/social/PeopleScreen';
+import { FriendsScreen } from '../screens/social/FriendsScreen';
+import { NotificationsScreen } from '../screens/social/NotificationsScreen';
+import { ConversationsScreen } from '../screens/messaging/ConversationsScreen';
+import { ChatScreen } from '../screens/messaging/ChatScreen';
 import type { MainStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -31,6 +38,17 @@ export function MainNavigator() {
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="Groups" component={GroupsScreen} />
+      <Stack.Screen name="ExperienceDetail" component={ExperienceDetailScreen} />
+      <Stack.Screen
+        name="CreateExperience"
+        component={CreateExperienceScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen name="People" component={PeopleScreen} />
+      <Stack.Screen name="Friends" component={FriendsScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="Conversations" component={ConversationsScreen} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
     </Stack.Navigator>
   );
 }

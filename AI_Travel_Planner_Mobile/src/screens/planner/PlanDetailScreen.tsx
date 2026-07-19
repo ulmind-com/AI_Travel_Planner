@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMutation } from '@tanstack/react-query';
-import LinearGradient from 'react-native-linear-gradient';
+import { Gradient as LinearGradient } from '../../components/ui/Gradient';
 import {
   ArrowLeft,
   Bookmark,
