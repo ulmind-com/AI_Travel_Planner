@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Receipt, Wallet } from 'lucide-react-native';
+import { ArrowLeft, Plus, Receipt, Wallet } from 'lucide-react-native';
 import { AppText, Card } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
@@ -24,7 +24,9 @@ export function ExpensesScreen({ navigation }: MainStackScreenProps<'Expenses'>)
           <ArrowLeft size={22} color={colors.ink800} />
         </Pressable>
         <AppText variant="h3">Expenses</AppText>
-        <View style={styles.circle} />
+        <Pressable style={styles.circle} onPress={() => navigation.navigate('AddExpense')} hitSlop={10}>
+          <Plus size={20} color={colors.brand} />
+        </Pressable>
       </View>
 
       <FlatList

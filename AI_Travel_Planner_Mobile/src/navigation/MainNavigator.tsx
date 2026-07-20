@@ -19,6 +19,8 @@ import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
 import { SafetyScreen } from '../screens/safety/SafetyScreen';
 import { TrainsScreen } from '../screens/trains/TrainsScreen';
 import { ExpensesScreen } from '../screens/expenses/ExpensesScreen';
+import { AddExpenseScreen } from '../screens/expenses/AddExpenseScreen';
+import { BookingsScreen } from '../screens/expenses/BookingsScreen';
 import { ReviewsScreen } from '../screens/reviews/ReviewsScreen';
 import { TravelIntelScreen } from '../screens/intel/TravelIntelScreen';
 import type { MainStackParamList } from './types';
@@ -63,6 +65,12 @@ export function MainNavigator() {
       <Stack.Screen name="Safety" component={SafetyScreen} />
       <Stack.Screen name="Trains" component={TrainsScreen} />
       <Stack.Screen name="Expenses" component={ExpensesScreen} />
+      <Stack.Screen
+        name="AddExpense"
+        component={AddExpenseScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen name="Bookings" component={BookingsScreen} />
       <Stack.Screen name="Reviews" component={ReviewsScreen} />
       <Stack.Screen name="TravelIntel" component={TravelIntelScreen} />
     </Stack.Navigator>

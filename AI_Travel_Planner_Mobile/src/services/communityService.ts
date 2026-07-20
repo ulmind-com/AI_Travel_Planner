@@ -59,12 +59,17 @@ export async function getStories(): Promise<Story[]> {
 
 export async function getGroups(): Promise<Group[]> {
   const { data } = await api.get('/community/groups');
-  return (data?.data ?? []) as Group[];
+  return (data?.groups ?? data?.data ?? []) as Group[];
 }
 
 export async function getMyGroups(): Promise<Group[]> {
   const { data } = await api.get('/community/groups/my');
-  return (data?.data ?? []) as Group[];
+  return (data?.groups ?? data?.data ?? []) as Group[];
+}
+
+export async function getGroupById(id: string): Promise<Group | null> {
+  const { data } = await api.get(`/community/groups/${id}`);
+  return (data?.group ?? data?.data ?? null) as Group | null;
 }
 
 export async function joinGroup(groupId: string): Promise<void> {
