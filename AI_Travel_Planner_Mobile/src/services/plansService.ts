@@ -17,6 +17,12 @@ export async function getMyPlans(): Promise<Plan[]> {
   return (data?.data ?? []) as Plan[];
 }
 
+/** Personalized AI recommendations (falls back to latest community plans). */
+export async function getRecommendations(): Promise<Plan[]> {
+  const { data } = await api.get('/plans/recommendations');
+  return (data?.data ?? []) as Plan[];
+}
+
 /** Fetch a single plan by id (public/shared). */
 export async function getPlanById(id: string): Promise<Plan | null> {
   const { data } = await api.get(`/plans/public/${id}`);

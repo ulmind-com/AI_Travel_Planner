@@ -14,10 +14,13 @@ import {
   Sparkles,
   Star,
 } from 'lucide-react-native';
+import { useQuery } from '@tanstack/react-query';
 import { AppText, Card, Chip, IconTile } from '../../components/ui';
+import { PlanCard } from '../../components/PlanCard';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
+import { getRecommendations } from '../../services/plansService';
 import { FEATURED, INSPIRE } from './homeData';
 import type { TabScreenProps } from '../../navigation/types';
 
@@ -37,6 +40,12 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
 
   const openPlanner = (prefillTo?: string) => navigation.navigate('Planner', { prefillTo });
   const openChat = () => navigation.navigate('AIChat');
+
+  const { data: recommended } = useQuery({
+    queryKey: ['recommendations'],
+    queryFn: getRecommendations,
+    staleTime: 5 * 60 * 1000,
+  });
 
   return (
     <View style={styles.root}>
@@ -98,13 +107,23 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
           {/* Featured destination */}
           <FeaturedCard onPress={() => openPlanner(FEATURED.title)} />
 
-          {/* Inspire */}
+          {/* Inspire — real AI recommendations, falling back to curated */}
           <View style={styles.sectionHead}>
             <AppText variant="h3">Inspire next adventure</AppText>
           </View>
-          {INSPIRE.map(item => (
-            <InspireRow key={item.id} item={item} onPress={() => openPlanner(item.title)} />
-          ))}
+          {recommended && recommended.length > 0
+            ? recommended
+                .slice(0, 6)
+                .map((plan, i) => (
+                  <PlanCard
+                    key={plan._id ?? i}
+                    plan={plan}
+                    onPress={() => navigation.navigate('PlanDetail', { plan })}
+                  />
+                ))
+            : INSPIRE.map(item => (
+                <InspireRow key={item.id} item={item} onPress={() => openPlanner(item.title)} />
+              ))}
 
           <View style={{ height: 120 }} />
         </ScrollView>
