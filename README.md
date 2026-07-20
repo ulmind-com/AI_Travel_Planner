@@ -57,7 +57,7 @@ npm run dev
 
 ## 📱 Mobile  (`/AI_Travel_Planner_Mobile`)
 
-**Expo** app (SDK 57, RN 0.86, new architecture) that runs in **Expo Go** —
+**Expo** app (SDK 54, RN 0.81, new architecture) that runs in **Expo Go** —
 scan a QR, no Android SDK / Xcode needed. Premium glassmorphic UI (soft sky
 gradients, frosted cards, Outfit + Inter). Full backend feature parity: AI
 planner, AI chat, community, experiences, social, messaging, expenses, safety,

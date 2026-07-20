@@ -1,6 +1,6 @@
 # AI Travel Planner — Mobile (Expo)
 
-Premium **Expo** app (SDK 57 · React Native 0.86 · new architecture) — runs in
+Premium **Expo** app (SDK 54 · React Native 0.81 · new architecture) — runs in
 **Expo Go** (scan a QR, no Android SDK / Xcode needed). Glassmorphic UI: dreamy
 sky-blue gradients, frosted cards, Outfit + Inter type, floating glass tab bar.
 
@@ -8,7 +8,7 @@ sky-blue gradients, frosted cards, Outfit + Inter type, floating glass tab bar.
 
 | Concern | Library |
 |---|---|
-| Runtime | Expo SDK 57 (Expo Go compatible) |
+| Runtime | Expo SDK 54 (Expo Go compatible) |
 | Navigation | `@react-navigation/native` · native-stack · bottom-tabs |
 | Auth | Firebase JS SDK (`firebase/auth`) + AsyncStorage persistence |
 | Data | `axios` + `@tanstack/react-query` (Bearer Firebase ID token) |
