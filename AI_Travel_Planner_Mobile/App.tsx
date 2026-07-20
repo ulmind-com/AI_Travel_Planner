@@ -1,15 +1,18 @@
 /**
  * AI Travel Planner — Expo (Expo Go compatible) app root.
  */
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from './src/context/AuthContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { queryClient } from './src/lib/queryClient';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -22,13 +25,23 @@ export default function App() {
     'Inter-SemiBold': require('./src/assets/fonts/Inter-SemiBold.ttf'),
   });
 
+  useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync().catch(() => {});
+  }, [fontsLoaded]);
+
+  const onLayout = useCallback(() => {
+    if (fontsLoaded) SplashScreen.hideAsync().catch(() => {});
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>
       <SafeAreaProvider>
         <StatusBar style="dark" />
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <RootNavigator fontsReady={fontsLoaded} />
+            <RootNavigator />
           </AuthProvider>
         </QueryClientProvider>
       </SafeAreaProvider>
