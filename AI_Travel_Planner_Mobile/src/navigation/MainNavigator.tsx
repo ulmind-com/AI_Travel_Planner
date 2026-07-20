@@ -19,6 +19,8 @@ import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
 import { SafetyScreen } from '../screens/safety/SafetyScreen';
 import { TrainsScreen } from '../screens/trains/TrainsScreen';
 import { ExpensesScreen } from '../screens/expenses/ExpensesScreen';
+import { ReviewsScreen } from '../screens/reviews/ReviewsScreen';
+import { TravelIntelScreen } from '../screens/intel/TravelIntelScreen';
 import type { MainStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -61,6 +63,8 @@ export function MainNavigator() {
       <Stack.Screen name="Safety" component={SafetyScreen} />
       <Stack.Screen name="Trains" component={TrainsScreen} />
       <Stack.Screen name="Expenses" component={ExpensesScreen} />
+      <Stack.Screen name="Reviews" component={ReviewsScreen} />
+      <Stack.Screen name="TravelIntel" component={TravelIntelScreen} />
     </Stack.Navigator>
   );
 }

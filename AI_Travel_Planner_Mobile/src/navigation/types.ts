@@ -38,6 +38,8 @@ export type MainStackParamList = {
   Safety: undefined;
   Trains: undefined;
   Expenses: undefined;
+  Reviews: undefined;
+  TravelIntel: { destination?: string } | undefined;
 };
 
 export type RootStackParamList = {

@@ -1,11 +1,19 @@
 import api from '../lib/api';
 
-/** Live travel intelligence (advisories, weather, safety, tips). */
-export async function getTravelIntel(destination?: string): Promise<any> {
-  const { data } = await api.get('/travel/intel', {
-    params: destination ? { destination } : undefined,
-  });
-  return data?.data ?? data;
+export interface TravelIntel {
+  weather?: { temp?: number; rain?: number; wind?: number; uv?: number; humidity?: number; description?: string };
+  crowdLevel?: string;
+  bestTimeToday?: string;
+  riskLevel?: string;
+  recommendations?: string[];
+  riskDetails?: { level?: string; reasons?: string[]; alerts?: any[] };
+  [key: string]: any;
+}
+
+/** Live travel intelligence (weather, crowd, risk, best time, tips) for a location. */
+export async function getTravelIntel(location: string): Promise<TravelIntel> {
+  const { data } = await api.get('/travel/intel', { params: { location }, timeout: 45000 });
+  return (data?.data ?? data) as TravelIntel;
 }
 
 /** Generic bookings (hotel/plan) for the user. */

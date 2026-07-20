@@ -10,8 +10,10 @@ import {
   LogOut,
   MessageCircle,
   Pencil,
+  Radar,
   Shield,
   ShieldCheck,
+  Star,
   Train,
   Users,
   Wallet,
@@ -47,9 +49,11 @@ export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
     { key: 'trips', label: 'Saved trips', icon: Compass, tint: colors.brand, go: () => navigation.navigate('Tabs') },
     { key: 'expenses', label: 'Expense splits', icon: Wallet, tint: colors.green, go: () => navigation.navigate('Expenses') },
     { key: 'trains', label: 'Train bookings', icon: Train, tint: colors.blueChip, go: () => navigation.navigate('Trains') },
+    { key: 'intel', label: 'Live travel intel', icon: Radar, tint: colors.brand, go: () => navigation.navigate('TravelIntel') },
     { key: 'people', label: 'Find travelers', icon: Users, tint: colors.purple, go: () => navigation.navigate('People') },
     { key: 'messages', label: 'Messages', icon: MessageCircle, tint: colors.brandDark, go: () => navigation.navigate('Conversations') },
     { key: 'safety', label: 'Safety center', icon: Shield, tint: colors.coral, go: () => navigation.navigate('Safety') },
+    { key: 'reviews', label: 'Reviews', icon: Star, tint: colors.gold, go: () => navigation.navigate('Reviews') },
     { key: 'notifications', label: 'Notifications', icon: Bell, tint: colors.gold, go: () => navigation.navigate('Notifications') },
   ];
 
