@@ -4,15 +4,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Gradient as LinearGradient } from '../../components/ui/Gradient';
 import {
   Bell,
+  Building2,
   CalendarDays,
   Car,
+  Castle,
   DollarSign,
   Hotel,
+  Landmark,
   MessageCircle,
   Plane,
   Route,
   Sparkles,
   Star,
+  TreePine,
 } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { AppText, Card, Chip, IconTile } from '../../components/ui';
@@ -21,7 +25,8 @@ import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { getRecommendations } from '../../services/plansService';
-import { FEATURED, INSPIRE } from './homeData';
+import { getFirstName } from '../../lib/name';
+import { FEATURED, INSPIRE, type InspireIcon } from './homeData';
 import type { TabScreenProps } from '../../navigation/types';
 
 const FILTERS = [
@@ -30,12 +35,19 @@ const FILTERS = [
   { key: 'budget', label: 'Budget', icon: <DollarSign size={18} color={colors.brand} /> },
 ];
 
+/** Destination glyphs — icons instead of emoji so type/rendering stays consistent. */
+const INSPIRE_ICONS: Record<InspireIcon, React.ComponentType<any>> = {
+  castle: Castle,
+  balloon: Landmark,
+  torii: TreePine,
+  colosseum: Building2,
+};
+
 export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
   const { profile, firebaseUser } = useAuth();
   const [filter, setFilter] = useState('timeline');
 
-  const name =
-    profile?.username || firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'Traveler';
+  const name = getFirstName(profile, firebaseUser);
   const month = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
 
   const openPlanner = (prefillTo?: string) => navigation.navigate('Planner', { prefillTo });
@@ -159,8 +171,12 @@ function FeaturedCard({ onPress }: { onPress?: () => void }) {
             ))}
           </View>
         </View>
-        <View style={styles.emojiBadge}>
-          <AppText variant="hero">{f.emoji}</AppText>
+        <View style={styles.glyphBadge}>
+          {React.createElement(INSPIRE_ICONS[f.icon], {
+            size: 38,
+            color: colors.white,
+            strokeWidth: 1.6,
+          })}
         </View>
       </LinearGradient>
     </Pressable>
@@ -171,7 +187,11 @@ function InspireRow({ item, onPress }: { item: (typeof INSPIRE)[number]; onPress
   return (
     <Card onPress={onPress} style={styles.inspire} rounded="xl">
       <LinearGradient colors={item.gradient} style={styles.inspireThumb}>
-        <AppText variant="h2">{item.emoji}</AppText>
+        {React.createElement(INSPIRE_ICONS[item.icon], {
+          size: 26,
+          color: item.tint,
+          strokeWidth: 1.8,
+        })}
       </LinearGradient>
       <View style={styles.inspireBody}>
         <AppText variant="h3">{item.title}</AppText>
@@ -250,11 +270,13 @@ const styles = StyleSheet.create({
   bullets: { marginTop: spacing.md, gap: 6 },
   bulletRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.9)' },
-  emojiBadge: {
+  glyphBadge: {
     width: 84,
     height: 84,
-    borderRadius: 24,
+    borderRadius: 26,
     backgroundColor: 'rgba(255,255,255,0.22)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',

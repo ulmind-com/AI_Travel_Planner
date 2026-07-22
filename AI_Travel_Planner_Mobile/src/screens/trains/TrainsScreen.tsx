@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRightLeft, Clock, Search, Train as TrainIcon } from 'lucide-react-native';
+import { ArrowLeft, ArrowRight, ArrowRightLeft, Clock, Search, Train as TrainIcon } from 'lucide-react-native';
 import { AppText, Button, Card, SelectChip } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/typography';
@@ -237,10 +237,20 @@ export function TrainsScreen({ navigation }: MainStackScreenProps<'Trains'>) {
                   </View>
                 ) : null}
               </View>
-              <AppText variant="caption" muted>
-                {item.fromStation} → {item.toStation}
-                {item.seatClass ? ` · ${item.seatClass}` : ''}
-              </AppText>
+              <View style={styles.routeRow}>
+                <AppText variant="caption" muted>
+                  {item.fromStation}
+                </AppText>
+                <ArrowRight size={13} color={colors.ink400} />
+                <AppText variant="caption" muted>
+                  {item.toStation}
+                </AppText>
+                {item.seatClass ? (
+                  <AppText variant="caption" muted>
+                    · {item.seatClass}
+                  </AppText>
+                ) : null}
+              </View>
               {item.pnr ? (
                 <AppText variant="label" muted>
                   PNR {item.pnr}
@@ -315,6 +325,7 @@ const styles = StyleSheet.create({
   timeMid: { alignItems: 'center', gap: 2 },
   bookingCard: { backgroundColor: colors.white, gap: 6, marginBottom: spacing.md, ...shadow.sm },
   statusPill: { backgroundColor: colors.brandSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill },
+  routeRow: { flexDirection: 'row', alignItems: 'center', gap: 5, flexWrap: 'wrap' },
   cancelBtn: { marginTop: spacing.sm },
   empty: { paddingTop: spacing.xxxl, alignItems: 'center' },
 });

@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, MapPin, Send, Sparkles, Trash2 } from 'lucide-react-native';
+import { ArrowLeft, Lightbulb, MapPin, Send, Sparkles, Trash2 } from 'lucide-react-native';
 import { AppText } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/typography';
@@ -112,9 +112,12 @@ export function AIChatScreen({ navigation }: MainStackScreenProps<'AIChat'>) {
           </View>
           <View>
             <AppText variant="h3">AI Assistant</AppText>
-            <AppText variant="label" color={colors.success}>
-              ● Online
-            </AppText>
+            <View style={styles.statusRow}>
+              <View style={styles.statusDot} />
+              <AppText variant="label" color={colors.success}>
+                Online
+              </AppText>
+            </View>
           </View>
         </View>
         {messages.length > 0 ? (
@@ -234,9 +237,12 @@ function MessageBubble({ bubble }: { bubble: Bubble }) {
             {ai?.tips && ai.tips.length > 0 ? (
               <View style={styles.tips}>
                 {ai.tips.slice(0, 3).map((t, i) => (
-                  <AppText key={i} variant="caption" muted style={{ marginTop: 2 }}>
-                    💡 {t}
-                  </AppText>
+                  <View key={i} style={styles.tipRow}>
+                    <Lightbulb size={13} color={colors.gold} />
+                    <AppText variant="caption" muted style={{ flex: 1 }}>
+                      {t}
+                    </AppText>
+                  </View>
                 ))}
               </View>
             ) : null}
@@ -291,6 +297,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#2FBF71' },
   aiDot: {
     width: 36,
     height: 36,
@@ -327,7 +335,8 @@ const styles = StyleSheet.create({
   },
   itin: { marginTop: 10, gap: 6 },
   itinDay: { flexDirection: 'row', gap: 8, alignItems: 'center' },
-  tips: { marginTop: 8 },
+  tips: { marginTop: 8, gap: 4 },
+  tipRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
   costTag: {
     alignSelf: 'flex-start',
     marginTop: 10,

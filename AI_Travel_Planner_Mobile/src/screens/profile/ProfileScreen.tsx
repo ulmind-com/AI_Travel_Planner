@@ -24,12 +24,13 @@ import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { getTrustScore } from '../../services/socialService';
+import { getDisplayName, getInitial } from '../../lib/name';
 import type { TabScreenProps } from '../../navigation/types';
 
 export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
   const { profile, firebaseUser, signOut } = useAuth();
-  const name =
-    profile?.username || firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'Traveler';
+  const name = getDisplayName(profile, firebaseUser);
+  const initial = getInitial(profile, firebaseUser);
   const email = profile?.email || firebaseUser?.email || '';
   const avatar = profile?.profileImage || (profile as any)?.profilepicture;
 
@@ -76,7 +77,7 @@ export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
                 <Image source={{ uri: avatar }} style={styles.avatarImg} />
               ) : (
                 <AppText variant="h1" color={colors.white}>
-                  {name.charAt(0).toUpperCase()}
+                  {initial}
                 </AppText>
               )}
             </View>

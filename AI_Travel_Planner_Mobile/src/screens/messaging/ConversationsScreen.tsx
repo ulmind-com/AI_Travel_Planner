@@ -19,7 +19,7 @@ function titleFor(conv: Conversation, uid?: string): string {
 }
 
 function preview(conv: Conversation): string {
-  if (!conv.lastMessage) return 'Say hello 👋';
+  if (!conv.lastMessage) return 'Say hello';
   return typeof conv.lastMessage === 'string' ? conv.lastMessage : conv.lastMessage.content || '';
 }
 

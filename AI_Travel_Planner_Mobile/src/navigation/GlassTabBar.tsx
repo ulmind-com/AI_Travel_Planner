@@ -1,13 +1,14 @@
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Compass, Home, MapPinned, User, Users } from 'lucide-react-native';
+import { Gradient } from '../components/ui/Gradient';
 import { colors } from '../theme/colors';
 import { shadow } from '../theme';
 import { AppText } from '../components/ui/AppText';
 
-const ICONS: Record<string, any> = {
+const ICONS: Record<string, React.ComponentType<any>> = {
   Home,
   Explore: Compass,
   Community: Users,
@@ -15,7 +16,7 @@ const ICONS: Record<string, any> = {
   Profile: User,
 };
 
-/** Floating frosted-glass tab bar. */
+/** Floating frosted tab bar with an animated gradient pill on the active tab. */
 export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
 
@@ -26,10 +27,8 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
         <View style={styles.row}>
           {state.routes.map((route, index) => {
             const { options } = descriptors[route.key];
-            const label =
-              (options.tabBarLabel as string) ?? options.title ?? route.name;
+            const label = (options.tabBarLabel as string) ?? options.title ?? route.name;
             const focused = state.index === index;
-            const Icon = ICONS[route.name] ?? Home;
 
             const onPress = () => {
               const event = navigation.emit({
@@ -37,32 +36,98 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
                 target: route.key,
                 canPreventDefault: true,
               });
-              if (!focused && !event.defaultPrevented) {
-                navigation.navigate(route.name);
-              }
+              if (!focused && !event.defaultPrevented) navigation.navigate(route.name);
             };
 
             return (
-              <Pressable key={route.key} onPress={onPress} style={styles.item} hitSlop={6}>
-                <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-                  <Icon
-                    size={22}
-                    color={focused ? colors.white : colors.ink400}
-                    strokeWidth={focused ? 2.4 : 2}
-                  />
-                </View>
-                <AppText
-                  variant="label"
-                  color={focused ? colors.ink900 : colors.ink400}
-                  style={styles.label}>
-                  {label}
-                </AppText>
-              </Pressable>
+              <TabItem
+                key={route.key}
+                name={route.name}
+                label={label}
+                focused={focused}
+                onPress={onPress}
+              />
             );
           })}
         </View>
       </View>
     </View>
+  );
+}
+
+function TabItem({
+  name,
+  label,
+  focused,
+  onPress,
+}: {
+  name: string;
+  label: string;
+  focused: boolean;
+  onPress: () => void;
+}) {
+  const anim = useRef(new Animated.Value(focused ? 1 : 0)).current;
+  const press = useRef(new Animated.Value(1)).current;
+  const Icon = ICONS[name] ?? Home;
+
+  useEffect(() => {
+    Animated.spring(anim, {
+      toValue: focused ? 1 : 0,
+      useNativeDriver: true,
+      speed: 16,
+      bounciness: 10,
+    }).start();
+  }, [focused, anim]);
+
+  const pillStyle = {
+    opacity: anim,
+    transform: [
+      { scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1] }) },
+    ],
+  };
+  const contentStyle = {
+    transform: [
+      { scale: press },
+      { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [0, -1] }) },
+    ],
+  };
+
+  return (
+    <Pressable
+      style={styles.item}
+      onPress={onPress}
+      onPressIn={() =>
+        Animated.spring(press, { toValue: 0.9, useNativeDriver: true, speed: 40 }).start()
+      }
+      onPressOut={() =>
+        Animated.spring(press, { toValue: 1, useNativeDriver: true, speed: 40 }).start()
+      }
+      hitSlop={6}>
+      <Animated.View style={contentStyle}>
+        <View style={styles.iconWrap}>
+          <Animated.View style={[StyleSheet.absoluteFill, styles.pill, pillStyle]}>
+            <Gradient
+              colors={colors.brandGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+          <Icon
+            size={21}
+            color={focused ? colors.white : colors.ink400}
+            strokeWidth={focused ? 2.4 : 1.9}
+          />
+        </View>
+      </Animated.View>
+      <AppText
+        variant="label"
+        color={focused ? colors.ink900 : colors.ink400}
+        style={[styles.label, focused && styles.labelActive]}
+        numberOfLines={1}>
+        {label}
+      </AppText>
+    </Pressable>
   );
 }
 
@@ -72,34 +137,32 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     backgroundColor: 'transparent',
   },
   bar: {
-    borderRadius: 30,
+    borderRadius: 28,
     overflow: 'hidden',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,255,255,0.7)',
-    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderColor: 'rgba(255,255,255,0.75)',
+    backgroundColor: 'rgba(255,255,255,0.96)',
   },
-  barFill: { backgroundColor: 'rgba(255,255,255,0.96)' },
+  barFill: { backgroundColor: 'rgba(255,255,255,0.97)' },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 4,
   },
-  item: { alignItems: 'center', justifyContent: 'center', flex: 1, gap: 4 },
+  item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3 },
   iconWrap: {
-    width: 44,
+    width: 48,
     height: 34,
     borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconWrapActive: {
-    backgroundColor: colors.ink900,
-  },
-  label: { fontSize: 11 },
+  pill: { borderRadius: 17, overflow: 'hidden' },
+  label: { fontSize: 10.5, letterSpacing: 0.1 },
+  labelActive: { letterSpacing: 0.1 },
 });

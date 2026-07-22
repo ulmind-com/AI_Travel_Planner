@@ -92,7 +92,7 @@ export function ChatScreen({ navigation, route }: MainStackScreenProps<'Chat'>) 
           ListEmptyComponent={
             <View style={styles.empty}>
               <AppText variant="body" muted center>
-                No messages yet. Say hello 👋
+                No messages yet — say hello
               </AppText>
             </View>
           }
