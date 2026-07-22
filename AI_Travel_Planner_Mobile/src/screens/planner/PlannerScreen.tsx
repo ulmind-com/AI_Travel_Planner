@@ -16,16 +16,20 @@ import { useAuth } from '../../context/AuthContext';
 import type { MainStackScreenProps } from '../../navigation/types';
 import type { PlanSearchInput } from '../../types/plan';
 
-const BUDGETS = [
-  { key: 'Budget', range: 'low' },
-  { key: 'Comfort', range: 'medium' },
-  { key: 'Luxury', range: 'high' },
+/**
+ * Budget tiers map to a numeric spend cap (INR) — the backend Plan model stores
+ * `budget` as a Number and `budget_range` as the tier label.
+ */
+const BUDGETS: { key: string; range: 'budget' | 'mid' | 'luxury'; amount: number; hint: string }[] = [
+  { key: 'Budget', range: 'budget', amount: 25000, hint: '≈ ₹25k' },
+  { key: 'Comfort', range: 'mid', amount: 65000, hint: '≈ ₹65k' },
+  { key: 'Luxury', range: 'luxury', amount: 200000, hint: '≈ ₹2L' },
 ];
 const DURATIONS = [
-  { key: 'Weekend', label: 'Weekend', value: '2-3 days' },
-  { key: 'Short', label: 'Short trip', value: '4-5 days' },
-  { key: 'Week', label: 'A week', value: '7 days' },
-  { key: 'Long', label: 'Long haul', value: '10+ days' },
+  { key: 'Weekend', label: 'Weekend', days: 3 },
+  { key: 'Short', label: 'Short trip', days: 5 },
+  { key: 'Week', label: 'A week', days: 7 },
+  { key: 'Long', label: 'Long haul', days: 10 },
 ];
 const STYLES = ['Adventure', 'Relax', 'Culture', 'Food', 'Nature', 'Nightlife', 'Shopping', 'Beaches'];
 
@@ -70,11 +74,11 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
       from: from.trim(),
       date,
       travelers,
-      budget,
+      budget: budgetMeta.amount,
       budget_range: budgetMeta.range,
-      travel_style: budget,
+      travel_style: styleSel[0] ?? 'Balanced',
       activities: styleSel,
-      duration: durMeta.value,
+      duration: durMeta.days,
     };
     navigation.navigate('PlanResults', { input });
   };
@@ -155,7 +159,7 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
               {BUDGETS.map(b => (
                 <SelectChip
                   key={b.key}
-                  label={b.key}
+                  label={`${b.key} · ${b.hint}`}
                   selected={budget === b.key}
                   onPress={() => setBudget(b.key)}
                 />

@@ -51,7 +51,7 @@ export interface Plan {
   from: string;
   date?: string;
   travelers?: number;
-  budget?: string;
+  budget?: number;
   budget_range?: string;
   activities?: string[];
   travel_style?: string;
@@ -74,15 +74,20 @@ export interface Plan {
   createdAt?: string;
 }
 
-/** Request body for POST /plans/search/destination */
+/**
+ * Request body for POST /plans/search/destination.
+ * NOTE: `budget` is a NUMBER (the spend cap the Plan model stores), while
+ * `budget_range` is the tier label ("budget" | "mid" | "luxury"), and
+ * `duration` is a day count — this matches the web client + Plan schema.
+ */
 export interface PlanSearchInput {
   to: string;
   from: string;
   date: string;
   travelers: number;
-  budget: string;
-  budget_range?: string;
+  budget: number;
+  budget_range?: 'budget' | 'mid' | 'luxury';
   activities?: string[];
   travel_style?: string;
-  duration?: string;
+  duration?: number;
 }
