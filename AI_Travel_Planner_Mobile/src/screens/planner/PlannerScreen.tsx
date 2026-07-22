@@ -71,6 +71,10 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
   const [travelersText, setTravelersText] = useState('2');
   const [budget, setBudget] = useState('Comfort');
   const [customBudget, setCustomBudget] = useState('');
+  const [customDays, setCustomDays] = useState('');
+  const [customVibes, setCustomVibes] = useState<string[]>([]);
+  const [vibeInput, setVibeInput] = useState('');
+  const [addingVibe, setAddingVibe] = useState(false);
   const [duration, setDuration] = useState('Short');
   const [styleSel, setStyleSel] = useState<string[]>(['Culture', 'Food']);
   const [error, setError] = useState('');
@@ -81,6 +85,21 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
 
   const toggleStyle = (s: string) =>
     setStyleSel(prev => (prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]));
+
+  const addVibe = () => {
+    const v = vibeInput.trim().replace(/\s+/g, ' ');
+    if (!v) return setAddingVibe(false);
+    const exists = [...STYLES, ...customVibes].some(x => x.toLowerCase() === v.toLowerCase());
+    if (!exists) setCustomVibes(prev => [...prev, v]);
+    setStyleSel(prev => (prev.some(x => x.toLowerCase() === v.toLowerCase()) ? prev : [...prev, v]));
+    setVibeInput('');
+    setAddingVibe(false);
+  };
+
+  const removeVibe = (v: string) => {
+    setCustomVibes(prev => prev.filter(x => x !== v));
+    setStyleSel(prev => prev.filter(x => x !== v));
+  };
 
   const onGenerate = () => {
     setError('');
@@ -99,7 +118,16 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
       range = meta.range;
     }
 
-    const durMeta = DURATIONS.find(d => d.key === duration)!;
+    let days: number;
+    if (duration === CUSTOM) {
+      days = parseInt(customDays.replace(/[^0-9]/g, ''), 10) || 0;
+      if (days < 1 || days > 60) return setError('Trip length must be between 1 and 60 days.');
+    } else {
+      days = DURATIONS.find(d => d.key === duration)!.days;
+    }
+
+    if (styleSel.length === 0) return setError('Pick at least one vibe for your trip.');
+
     const input: PlanSearchInput = {
       to: to.trim(),
       from: from.trim(),
@@ -109,7 +137,7 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
       budget_range: range,
       travel_style: styleSel[0] ?? 'Balanced',
       activities: styleSel,
-      duration: durMeta.days,
+      duration: days,
     };
     navigation.navigate('PlanResults', { input });
   };
@@ -235,12 +263,35 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
               {DURATIONS.map(d => (
                 <SelectChip
                   key={d.key}
-                  label={d.label}
+                  label={`${d.label} · ${d.days}d`}
                   selected={duration === d.key}
                   onPress={() => setDuration(d.key)}
                 />
               ))}
+              <SelectChip
+                label="Custom"
+                selected={duration === CUSTOM}
+                onPress={() => setDuration(CUSTOM)}
+              />
             </View>
+
+            {duration === CUSTOM ? (
+              <View style={styles.amountField}>
+                <TextInput
+                  style={styles.amountInput}
+                  value={customDays}
+                  onChangeText={t => setCustomDays(t.replace(/[^0-9]/g, '').slice(0, 2))}
+                  placeholder="How many days?"
+                  placeholderTextColor={colors.ink400}
+                  keyboardType="number-pad"
+                  selectionColor={colors.brand}
+                  autoFocus
+                />
+                <AppText variant="body" muted>
+                  days
+                </AppText>
+              </View>
+            ) : null}
           </Section>
 
           <Section title="Your vibe">
@@ -253,6 +304,49 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
                   onPress={() => toggleStyle(s)}
                 />
               ))}
+
+              {/* User-added vibes — tap to toggle, × to delete */}
+              {customVibes.map(v => {
+                const on = styleSel.includes(v);
+                return (
+                  <Pressable
+                    key={v}
+                    onPress={() => toggleStyle(v)}
+                    style={[styles.customVibe, on ? styles.customVibeOn : styles.customVibeOff]}>
+                    <AppText variant="bodyStrong" color={on ? colors.white : colors.ink700}>
+                      {v}
+                    </AppText>
+                    <Pressable onPress={() => removeVibe(v)} hitSlop={8}>
+                      <X size={14} color={on ? colors.white : colors.ink400} />
+                    </Pressable>
+                  </Pressable>
+                );
+              })}
+
+              {addingVibe ? (
+                <View style={styles.vibeInputWrap}>
+                  <TextInput
+                    style={styles.vibeInput}
+                    value={vibeInput}
+                    onChangeText={setVibeInput}
+                    placeholder="e.g. Wildlife"
+                    placeholderTextColor={colors.ink400}
+                    autoFocus
+                    maxLength={24}
+                    returnKeyType="done"
+                    onSubmitEditing={addVibe}
+                    onBlur={addVibe}
+                    selectionColor={colors.brand}
+                  />
+                </View>
+              ) : (
+                <Pressable style={styles.addVibe} onPress={() => setAddingVibe(true)}>
+                  <Plus size={16} color={colors.brand} />
+                  <AppText variant="bodyStrong" color={colors.brand}>
+                    Add your own
+                  </AppText>
+                </Pressable>
+              )}
             </View>
           </Section>
 
@@ -377,6 +471,45 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: fonts.display,
     fontSize: 22,
+    color: colors.ink900,
+    paddingVertical: 0,
+  },
+  customVibe: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    height: 44,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+  },
+  customVibeOn: { backgroundColor: colors.brand, borderColor: colors.brand },
+  customVibeOff: { backgroundColor: colors.surface, borderColor: 'transparent' },
+  addVibe: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.brandSoft,
+    borderWidth: 1.5,
+    borderColor: colors.brand,
+    borderStyle: 'dashed',
+  },
+  vibeInputWrap: {
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    height: 44,
+    minWidth: 150,
+    borderRadius: radius.pill,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: colors.brand,
+  },
+  vibeInput: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 15,
     color: colors.ink900,
     paddingVertical: 0,
   },
