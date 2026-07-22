@@ -15,10 +15,10 @@ export const API_PREFIX = '/api/v1';
 
 /** Firebase Web SDK config (public client config — safe to ship). */
 export const FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyBWMVnaXn2gn8_qpqhrS4EGgOks-tQPlL8',
-  authDomain: 'adventurenexus-2d97a.firebaseapp.com',
-  projectId: 'adventurenexus-2d97a',
-  storageBucket: 'adventurenexus-2d97a.firebasestorage.app',
-  messagingSenderId: '42855451170',
-  appId: '1:42855451170:web:414f13fe6db65f0395587b',
+  apiKey: 'AIzaSyCAraMVT1cr05Jhq8F7jhRdmZ-lxvGZtHo',
+  authDomain: 'ai-travel-planner-d392a.firebaseapp.com',
+  projectId: 'ai-travel-planner-d392a',
+  storageBucket: 'ai-travel-planner-d392a.firebasestorage.app',
+  messagingSenderId: '571075770817',
+  appId: '1:571075770817:web:d25921e0accf315e6bd740',
 };
