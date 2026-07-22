@@ -5,6 +5,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +17,7 @@ import {
   toISODate,
 } from '../../components/ui/DatePickerSheet';
 import { colors } from '../../theme/colors';
+import { fonts } from '../../theme/typography';
 import { radius, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import type { MainStackScreenProps } from '../../navigation/types';
@@ -37,6 +39,20 @@ const DURATIONS = [
   { key: 'Long', label: 'Long haul', days: 10 },
 ];
 const STYLES = ['Adventure', 'Relax', 'Culture', 'Food', 'Nature', 'Nightlife', 'Shopping', 'Beaches'];
+const CUSTOM = 'Custom';
+
+/** Infer the tier label the backend expects from a free-form amount. */
+function rangeForAmount(amount: number): 'budget' | 'mid' | 'luxury' {
+  if (amount <= 35000) return 'budget';
+  if (amount <= 120000) return 'mid';
+  return 'luxury';
+}
+
+/** 65000 -> "65,000" */
+function groupDigits(v: string): string {
+  const n = v.replace(/[^0-9]/g, '');
+  return n ? Number(n).toLocaleString('en-IN') : '';
+}
 
 /** Default: two weeks out, so the AI gets a realistic near-future trip date. */
 function defaultDate(): string {
@@ -52,11 +68,16 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
   const [from, setFrom] = useState(profile?.city || '');
   const [date, setDate] = useState(defaultDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [travelers, setTravelers] = useState(2);
+  const [travelersText, setTravelersText] = useState('2');
   const [budget, setBudget] = useState('Comfort');
+  const [customBudget, setCustomBudget] = useState('');
   const [duration, setDuration] = useState('Short');
   const [styleSel, setStyleSel] = useState<string[]>(['Culture', 'Food']);
   const [error, setError] = useState('');
+
+  const travelers = Math.min(99, Math.max(1, parseInt(travelersText, 10) || 1));
+  const bumpTravelers = (delta: number) =>
+    setTravelersText(String(Math.min(99, Math.max(1, travelers + delta))));
 
   const toggleStyle = (s: string) =>
     setStyleSel(prev => (prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]));
@@ -66,15 +87,26 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
     if (!to.trim()) return setError('Where do you want to go?');
     if (!from.trim()) return setError('Where are you travelling from?');
 
-    const budgetMeta = BUDGETS.find(b => b.key === budget)!;
+    let amount: number;
+    let range: 'budget' | 'mid' | 'luxury';
+    if (budget === CUSTOM) {
+      amount = parseInt(customBudget.replace(/[^0-9]/g, ''), 10) || 0;
+      if (amount < 1000) return setError('Enter a budget of at least ₹1,000.');
+      range = rangeForAmount(amount);
+    } else {
+      const meta = BUDGETS.find(b => b.key === budget)!;
+      amount = meta.amount;
+      range = meta.range;
+    }
+
     const durMeta = DURATIONS.find(d => d.key === duration)!;
     const input: PlanSearchInput = {
       to: to.trim(),
       from: from.trim(),
       date,
       travelers,
-      budget: budgetMeta.amount,
-      budget_range: budgetMeta.range,
+      budget: amount,
+      budget_range: range,
       travel_style: styleSel[0] ?? 'Balanced',
       activities: styleSel,
       duration: durMeta.days,
@@ -139,17 +171,24 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
 
           <Section title="Travelers">
             <View style={styles.stepper}>
-              <Pressable
-                style={styles.stepBtn}
-                onPress={() => setTravelers(t => Math.max(1, t - 1))}>
+              <Pressable style={styles.stepBtn} onPress={() => bumpTravelers(-1)}>
                 <Minus size={18} color={colors.ink700} />
               </Pressable>
-              <AppText variant="h3" style={styles.stepValue}>
-                {travelers} {travelers === 1 ? 'traveler' : 'travelers'}
-              </AppText>
-              <Pressable
-                style={styles.stepBtn}
-                onPress={() => setTravelers(t => Math.min(16, t + 1))}>
+              <View style={styles.stepValue}>
+                <TextInput
+                  style={styles.stepInput}
+                  value={travelersText}
+                  onChangeText={t => setTravelersText(t.replace(/[^0-9]/g, '').slice(0, 2))}
+                  onBlur={() => setTravelersText(String(travelers))}
+                  keyboardType="number-pad"
+                  maxLength={2}
+                  selectionColor={colors.brand}
+                />
+                <AppText variant="caption" muted>
+                  {travelers === 1 ? 'traveler' : 'travelers'}
+                </AppText>
+              </View>
+              <Pressable style={styles.stepBtn} onPress={() => bumpTravelers(1)}>
                 <Plus size={18} color={colors.ink700} />
               </Pressable>
             </View>
@@ -165,7 +204,30 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
                   onPress={() => setBudget(b.key)}
                 />
               ))}
+              <SelectChip
+                label="Custom"
+                selected={budget === CUSTOM}
+                onPress={() => setBudget(CUSTOM)}
+              />
             </View>
+
+            {budget === CUSTOM ? (
+              <View style={styles.amountField}>
+                <AppText variant="h3" color={colors.ink500}>
+                  ₹
+                </AppText>
+                <TextInput
+                  style={styles.amountInput}
+                  value={groupDigits(customBudget)}
+                  onChangeText={t => setCustomBudget(t.replace(/[^0-9]/g, '').slice(0, 9))}
+                  placeholder="Your total budget"
+                  placeholderTextColor={colors.ink400}
+                  keyboardType="number-pad"
+                  selectionColor={colors.brand}
+                  autoFocus
+                />
+              </View>
+            ) : null}
           </Section>
 
           <Section title="Trip length">
@@ -289,5 +351,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepValue: { flex: 1, textAlign: 'center' },
+  stepValue: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  stepInput: {
+    fontFamily: fonts.heading,
+    fontSize: 20,
+    lineHeight: 26,
+    color: colors.ink900,
+    textAlign: 'center',
+    minWidth: 56,
+    paddingVertical: 0,
+  },
+  amountField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.lg,
+    height: 60,
+    borderWidth: 1.5,
+    borderColor: colors.brand,
+  },
+  amountInput: {
+    flex: 1,
+    fontFamily: fonts.display,
+    fontSize: 22,
+    color: colors.ink900,
+    paddingVertical: 0,
+  },
 });
