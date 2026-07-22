@@ -39,15 +39,26 @@ export function CommunityScreen({ navigation }: TabScreenProps<'Community'>) {
           </Pressable>
         </View>
 
-        <View style={styles.tabs}>
-          {(['foryou', 'trending'] as Feed[]).map(f => (
-            <Pressable key={f} onPress={() => setFeed(f)} style={styles.tab}>
-              <AppText variant="bodyStrong" color={feed === f ? colors.ink900 : colors.ink400}>
-                {f === 'foryou' ? 'For you' : 'Trending'}
-              </AppText>
-              {feed === f ? <View style={styles.tabUnderline} /> : null}
-            </Pressable>
-          ))}
+        {/* Segmented control */}
+        <View style={styles.segment}>
+          {(['foryou', 'trending'] as Feed[]).map(f => {
+            const on = feed === f;
+            return (
+              <Pressable key={f} onPress={() => setFeed(f)} style={styles.segmentItem}>
+                {on ? (
+                  <Gradient
+                    colors={colors.brandGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                  />
+                ) : null}
+                <AppText variant="bodyStrong" color={on ? colors.white : colors.ink500}>
+                  {f === 'foryou' ? 'For you' : 'Trending'}
+                </AppText>
+              </Pressable>
+            );
+          })}
         </View>
 
         <FlatList
@@ -83,8 +94,14 @@ export function CommunityScreen({ navigation }: TabScreenProps<'Community'>) {
         />
       </SafeAreaView>
 
-      <Pressable style={styles.fab} onPress={() => navigation.navigate('CreatePost')}>
-        <Plus size={26} color={colors.white} />
+      <Pressable style={styles.fabWrap} onPress={() => navigation.navigate('CreatePost')}>
+        <Gradient
+          colors={colors.brandGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.fab}>
+          <Plus size={26} color={colors.white} />
+        </Gradient>
       </Pressable>
     </View>
   );
@@ -184,9 +201,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tabs: { flexDirection: 'row', gap: spacing.xl, paddingHorizontal: spacing.xl, marginTop: spacing.md },
-  tab: { paddingVertical: spacing.sm },
-  tabUnderline: { height: 3, borderRadius: 2, backgroundColor: colors.brand, marginTop: 6 },
+  segment: {
+    flexDirection: 'row',
+    marginHorizontal: spacing.xl,
+    marginTop: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+    padding: 4,
+  },
+  segmentItem: {
+    flex: 1,
+    height: 40,
+    borderRadius: radius.pill,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   list: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: 130 },
   stories: { gap: spacing.lg, paddingBottom: spacing.lg },
   storyItem: { alignItems: 'center', gap: 6, width: 68 },
@@ -226,16 +256,18 @@ const styles = StyleSheet.create({
   eventThumb: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   eventLoc: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   empty: { paddingTop: spacing.huge, alignItems: 'center' },
-  fab: {
+  fabWrap: {
     position: 'absolute',
     right: spacing.xl,
     bottom: 100,
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: colors.brand,
+    borderRadius: 30,
+    ...shadow.floating,
+  },
+  fab: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadow.floating,
   },
 });

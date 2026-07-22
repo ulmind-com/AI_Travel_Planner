@@ -1,7 +1,7 @@
-import React from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
-import { Gradient as LinearGradient } from './ui/Gradient';
-import { CalendarDays, MapPin, Sparkles, Star } from 'lucide-react-native';
+import React, { useRef } from 'react';
+import { Animated, Image, Pressable, StyleSheet, View } from 'react-native';
+import { CalendarDays, MapPin, Sparkles, Star, Users } from 'lucide-react-native';
+import { Gradient } from './ui/Gradient';
 import { AppText } from './ui/AppText';
 import { colors } from '../theme/colors';
 import { radius, shadow, spacing } from '../theme';
@@ -10,140 +10,172 @@ import type { Plan } from '../types/plan';
 const FALLBACK =
   'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1000&auto=format&fit=crop';
 
+function currencySymbol(c?: string) {
+  return c === 'EUR' ? '€' : c === 'INR' ? '₹' : c === 'GBP' ? '£' : '$';
+}
+
 function formatCost(plan: Plan): string | null {
   const total = plan.budget_breakdown?.total ?? plan.cost;
   if (!total) return null;
-  const cur = plan.budget_breakdown?.currency || '$';
-  const symbol = cur === 'USD' ? '$' : cur === 'EUR' ? '€' : cur === 'INR' ? '₹' : cur;
-  return `${symbol}${Math.round(Number(total)).toLocaleString()}`;
+  const sym = currencySymbol(plan.budget_breakdown?.currency);
+  const n = Math.round(Number(total));
+  return n >= 1000 ? `${sym}${Math.round(n / 1000)}k` : `${sym}${n}`;
 }
 
 export function PlanCard({ plan, onPress }: { plan: Plan; onPress?: () => void }) {
+  const scale = useRef(new Animated.Value(1)).current;
   const cost = formatCost(plan);
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-      <View style={styles.imageWrap}>
-        <Image
-          source={{ uri: plan.image_url || FALLBACK }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        <LinearGradient
-          colors={['transparent', 'rgba(10,16,30,0.55)']}
-          style={styles.imageShade}
-        />
-        {typeof plan.ai_score === 'number' && plan.ai_score > 0 ? (
-          <View style={styles.aiBadge}>
-            <Sparkles size={12} color={colors.white} />
-            <AppText variant="label" color={colors.white}>
-              {Math.round(plan.ai_score)}% match
-            </AppText>
-          </View>
-        ) : null}
-        <View style={styles.imageMeta}>
-          <View style={styles.locRow}>
-            <MapPin size={14} color={colors.white} />
-            <AppText variant="bodyStrong" color={colors.white} numberOfLines={1}>
-              {plan.name || plan.to}
-            </AppText>
-          </View>
-        </View>
-      </View>
+  const title = plan.name || plan.to;
 
-      <View style={styles.body}>
-        <View style={styles.metaRow}>
-          {plan.days ? (
-            <View style={styles.metaItem}>
-              <CalendarDays size={14} color={colors.ink500} />
-              <AppText variant="caption" muted>
-                {plan.days} days
+  const pressIn = () =>
+    Animated.spring(scale, { toValue: 0.975, useNativeDriver: true, speed: 40 }).start();
+  const pressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} style={styles.card}>
+        {/* Image */}
+        <View style={styles.imageWrap}>
+          <Image source={{ uri: plan.image_url || FALLBACK }} style={styles.image} resizeMode="cover" />
+          <Gradient
+            colors={['rgba(8,14,28,0.18)', 'rgba(8,14,28,0.02)', 'rgba(8,14,28,0.82)']}
+            style={StyleSheet.absoluteFill}
+          />
+
+          {typeof plan.ai_score === 'number' && plan.ai_score > 0 ? (
+            <Gradient colors={colors.brandGradient} style={styles.aiBadge}>
+              <Sparkles size={11} color={colors.white} />
+              <AppText variant="label" color={colors.white}>
+                {Math.round(plan.ai_score)}% match
               </AppText>
-            </View>
+            </Gradient>
           ) : null}
-          {typeof plan.star === 'number' && plan.star > 0 ? (
-            <View style={styles.metaItem}>
-              <Star size={14} color={colors.gold} fill={colors.gold} />
-              <AppText variant="caption" muted>
-                {plan.star.toFixed(1)}
-                {plan.total_reviews ? ` (${plan.total_reviews})` : ''}
-              </AppText>
-            </View>
-          ) : null}
+
           {cost ? (
-            <View style={styles.costPill}>
-              <AppText variant="label" color={colors.brandDark}>
+            <View style={styles.costBadge}>
+              <AppText variant="bodyStrong" color={colors.ink900}>
                 {cost}
               </AppText>
             </View>
           ) : null}
+
+          <View style={styles.imageFoot}>
+            <AppText variant="h2" color={colors.white} numberOfLines={1}>
+              {title}
+            </AppText>
+            <View style={styles.locRow}>
+              <MapPin size={13} color="rgba(255,255,255,0.9)" />
+              <AppText variant="caption" color="rgba(255,255,255,0.9)" numberOfLines={1}>
+                from {plan.from}
+              </AppText>
+            </View>
+          </View>
         </View>
 
-        {plan.destination_overview ? (
-          <AppText variant="caption" muted numberOfLines={2} style={styles.overview}>
-            {plan.destination_overview}
-          </AppText>
-        ) : null}
-
-        {plan.perfect_for && plan.perfect_for.length > 0 ? (
-          <View style={styles.tags}>
-            {plan.perfect_for.slice(0, 3).map(t => (
-              <View key={t} style={styles.tag}>
-                <AppText variant="label" color={colors.ink600}>
-                  {t}
+        {/* Body */}
+        <View style={styles.body}>
+          <View style={styles.pills}>
+            {plan.days ? (
+              <View style={styles.pill}>
+                <CalendarDays size={13} color={colors.brand} />
+                <AppText variant="label" color={colors.ink700}>
+                  {plan.days} days
                 </AppText>
               </View>
-            ))}
+            ) : null}
+            {plan.travelers ? (
+              <View style={styles.pill}>
+                <Users size={13} color={colors.green} />
+                <AppText variant="label" color={colors.ink700}>
+                  {plan.travelers}
+                </AppText>
+              </View>
+            ) : null}
+            {typeof plan.star === 'number' && plan.star > 0 ? (
+              <View style={styles.pill}>
+                <Star size={13} color={colors.gold} fill={colors.gold} />
+                <AppText variant="label" color={colors.ink700}>
+                  {plan.star.toFixed(1)}
+                </AppText>
+              </View>
+            ) : null}
           </View>
-        ) : null}
-      </View>
-    </Pressable>
+
+          {plan.destination_overview ? (
+            <AppText variant="caption" muted numberOfLines={2} style={styles.overview}>
+              {plan.destination_overview}
+            </AppText>
+          ) : null}
+
+          {plan.perfect_for && plan.perfect_for.length > 0 ? (
+            <View style={styles.tags}>
+              {plan.perfect_for.slice(0, 3).map(t => (
+                <View key={t} style={styles.tag}>
+                  <AppText variant="label" color={colors.brandDark} numberOfLines={1}>
+                    {t}
+                  </AppText>
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    borderRadius: radius.xl,
-    marginBottom: spacing.lg,
+    borderRadius: radius.xxl,
+    marginBottom: spacing.xl,
     overflow: 'hidden',
     ...shadow.card,
   },
-  pressed: { opacity: 0.94, transform: [{ scale: 0.995 }] },
-  imageWrap: { height: 170, backgroundColor: colors.surface },
+  imageWrap: { height: 210, backgroundColor: colors.surface },
   image: { width: '100%', height: '100%' },
-  imageShade: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 90 },
   aiBadge: {
     position: 'absolute',
-    top: 12,
-    left: 12,
+    top: 14,
+    left: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(47,144,234,0.92)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    gap: 5,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
     borderRadius: radius.pill,
   },
-  imageMeta: { position: 'absolute', left: 14, right: 14, bottom: 12 },
-  locRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  costBadge: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    ...shadow.sm,
+  },
+  imageFoot: { position: 'absolute', left: 16, right: 16, bottom: 14 },
+  locRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 3 },
   body: { padding: spacing.lg },
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  costPill: {
-    marginLeft: 'auto',
-    backgroundColor: colors.brandSoft,
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: colors.surface,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: radius.pill,
   },
   overview: { marginTop: spacing.md, lineHeight: 19 },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: spacing.md },
   tag: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.brandSoft,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: radius.pill,
+    maxWidth: '48%',
   },
 });
