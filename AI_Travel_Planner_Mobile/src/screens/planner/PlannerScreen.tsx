@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -8,8 +8,13 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Minus, Plus, Sparkles, X } from 'lucide-react-native';
+import { CalendarDays, ChevronRight, Minus, Plus, Sparkles, X } from 'lucide-react-native';
 import { AppText, Button, Input, SelectChip } from '../../components/ui';
+import {
+  DatePickerSheet,
+  formatFriendly,
+  toISODate,
+} from '../../components/ui/DatePickerSheet';
 import { colors } from '../../theme/colors';
 import { radius, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
@@ -33,26 +38,20 @@ const DURATIONS = [
 ];
 const STYLES = ['Adventure', 'Relax', 'Culture', 'Food', 'Nature', 'Nightlife', 'Shopping', 'Beaches'];
 
-function nextMonths(count = 6) {
-  const out: { label: string; value: string }[] = [];
-  const now = new Date();
-  for (let i = 0; i < count; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 15);
-    out.push({
-      label: d.toLocaleString('default', { month: 'short', year: '2-digit' }),
-      value: d.toISOString().slice(0, 10),
-    });
-  }
-  return out;
+/** Default: two weeks out, so the AI gets a realistic near-future trip date. */
+function defaultDate(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 14);
+  return toISODate(d);
 }
 
 export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Planner'>) {
   const { profile } = useAuth();
-  const months = useMemo(() => nextMonths(6), []);
 
   const [to, setTo] = useState(route.params?.prefillTo ?? '');
   const [from, setFrom] = useState(profile?.city || '');
-  const [date, setDate] = useState(months[1].value);
+  const [date, setDate] = useState(defaultDate);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [travelers, setTravelers] = useState(2);
   const [budget, setBudget] = useState('Comfort');
   const [duration, setDuration] = useState('Short');
@@ -124,16 +123,18 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
           />
 
           <Section title="When">
-            <View style={styles.wrapRow}>
-              {months.map(m => (
-                <SelectChip
-                  key={m.value}
-                  label={m.label}
-                  selected={date === m.value}
-                  onPress={() => setDate(m.value)}
-                />
-              ))}
-            </View>
+            <Pressable style={styles.dateField} onPress={() => setShowDatePicker(true)}>
+              <View style={styles.dateIcon}>
+                <CalendarDays size={20} color={colors.brand} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <AppText variant="label" muted>
+                  DEPARTURE DATE
+                </AppText>
+                <AppText variant="bodyStrong">{formatFriendly(date)}</AppText>
+              </View>
+              <ChevronRight size={20} color={colors.ink300} />
+            </Pressable>
           </Section>
 
           <Section title="Travelers">
@@ -208,6 +209,13 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
           <View style={{ height: spacing.xxl }} />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <DatePickerSheet
+        visible={showDatePicker}
+        value={date}
+        onSelect={setDate}
+        onClose={() => setShowDatePicker(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -248,6 +256,23 @@ const styles = StyleSheet.create({
   section: { marginTop: spacing.xl },
   sectionTitle: { marginBottom: spacing.md, letterSpacing: 1 },
   wrapRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  dateField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  dateIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
