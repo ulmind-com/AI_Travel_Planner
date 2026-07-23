@@ -8,7 +8,7 @@ import generateNewSearchDestinationPrompt, {
 
 import logger from "../../../shared/utils/logger";
 import getFullURL from "../../../shared/services/getFullURL.service";
-import { fetchUnsplashImage } from "../../../shared/services/unsplash.service";
+import { fetchUnsplashImage, resolveDestinationImage } from "../../../shared/services/unsplash.service";
 import { fetchWikipediaImage } from "../../../shared/services/wikipedia.service";
 import Plan from "../../../shared/database/models/planModel";
 import { IPlan } from "../../../shared/dtos/PlansDTO";
@@ -151,46 +151,44 @@ const searchNewDestination = async (req: Request, res: Response) => {
 
     // 🌐 5.5 Process each plan in the array (Fetch Images & Construct Objects)
     const processedPlans = await Promise.all(aiResponseArray.map(async (aiResponse: any) => {
-      // Strategy: Wikipedia -> Unsplash -> AI -> Hardcoded Fallback
+      // Strategy: Unsplash-first (destination-aware, dynamic) -> Wikipedia -> AI.
+      // No static/hardcoded photos — every fallback query stays relevant to the trip.
       const searchQuery = aiResponse.name || to;
       let destinationImage: string | undefined;
       let source = "none";
 
       try {
-        destinationImage = await fetchWikipediaImage(searchQuery);
-        if (destinationImage) source = "Wikipedia";
+        // 1. Unsplash, progressively broader but destination-relevant queries.
+        destinationImage = await resolveDestinationImage(aiResponse.name, to);
+        if (destinationImage) source = "Unsplash";
 
+        // 2. Wikipedia as a secondary source of a real photo of the place.
         if (!destinationImage) {
-          destinationImage = await fetchUnsplashImage(searchQuery);
-          if (destinationImage) source = "Unsplash";
+          destinationImage = await fetchWikipediaImage(searchQuery);
+          if (destinationImage) source = "Wikipedia";
         }
       } catch (imgError) {
         logger.error(`Image Fetch Error for ${searchQuery}:`, imgError);
       }
 
-      // Final URI Encoding & AI Fallback logic
+      // 3. AI-provided image_url only if the search sources found nothing.
       let finalImageUrl = destinationImage || aiResponse.image_url;
+      if (!destinationImage && aiResponse.image_url) source = "AI";
 
       if (finalImageUrl) {
         try {
-          // Simplest robust encoding
           if (finalImageUrl.startsWith('//')) finalImageUrl = 'https:' + finalImageUrl;
           const urlObj = new URL(finalImageUrl);
-          finalImageUrl = urlObj.toString(); // Standard URL string is already reasonably encoded
+          finalImageUrl = urlObj.toString();
         } catch (e) {
           finalImageUrl = encodeURI(finalImageUrl);
         }
       }
 
-      // STRICT FALLBACK: Ensure the card NEVER has a missing image
+      // Last resort: one more broad-but-relevant Unsplash query for the destination.
       if (!finalImageUrl || finalImageUrl.length < 10) {
-        const fallbacks = [
-          "https://images.unsplash.com/photo-1488646953014-85cb44e25828",
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1",
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-        ];
-        finalImageUrl = fallbacks[Math.floor(Math.random() * fallbacks.length)] + "?w=1000&auto=format&fit=crop";
-        source = "High-Quality Placeholder";
+        finalImageUrl = await fetchUnsplashImage(`${to} travel destination`);
+        source = finalImageUrl ? "Unsplash (broad)" : "none";
       }
 
       logger.info(`Search: Source [${source}] for "${searchQuery}" -> URL: ${finalImageUrl}`);

@@ -53,6 +53,57 @@ export const fetchUnsplashImage = async (query: string): Promise<string | undefi
     }
 };
 
+/** Strip stray quotes/whitespace the LLM often leaves in place names. */
+function cleanQuery(q?: string): string {
+    return (q || '')
+        .replace(/^[\s"'“”‘’]+/, '')
+        .replace(/[\s"'“”‘’]+$/, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+/**
+ * Unsplash-first, destination-aware image resolver.
+ * Tries progressively broader (but still destination-relevant) queries so the
+ * photo always matches the trip — no static/hardcoded placeholders.
+ *
+ * @param name  The AI-generated plan/place name (may contain junk quotes).
+ * @param to    The destination the user searched for.
+ * @returns A landscape image URL relevant to the destination, or undefined.
+ */
+export const resolveDestinationImage = async (
+    name?: string,
+    to?: string
+): Promise<string | undefined> => {
+    const cleanName = cleanQuery(name);
+    const cleanTo = cleanQuery(to);
+
+    // Ordered, de-duplicated candidate queries — most specific first.
+    const candidates = [
+        cleanName,
+        cleanTo,
+        cleanTo ? `${cleanTo} travel` : '',
+        cleanTo ? `${cleanTo} landscape` : '',
+        cleanName ? `${cleanName} tourism` : '',
+        'travel destination scenic',
+    ]
+        .map(cleanQuery)
+        .filter((q, i, arr) => q.length > 1 && arr.indexOf(q) === i);
+
+    for (const query of candidates) {
+        try {
+            const url = await fetchUnsplashImage(query);
+            if (url) {
+                logger.info(`resolveDestinationImage: matched "${query}"`);
+                return url;
+            }
+        } catch {
+            /* try next candidate */
+        }
+    }
+    return undefined;
+};
+
 /**
  * Fetches multiple high-quality images from Unsplash for a given place name.
  * Uses the Unsplash Search API.
