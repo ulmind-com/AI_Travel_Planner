@@ -2,13 +2,12 @@ import React, { useRef } from 'react';
 import { Animated, Image, Pressable, StyleSheet, View } from 'react-native';
 import { Heart, MapPin, Star } from 'lucide-react-native';
 import { Gradient } from './ui/Gradient';
+import { SmartImage } from './ui/SmartImage';
 import { AppText } from './ui/AppText';
 import { colors } from '../theme/colors';
 import { radius, shadow, spacing } from '../theme';
+import { cleanTitle } from '../lib/text';
 import type { Experience } from '../services/experiencesService';
-
-const FALLBACK =
-  'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1000&auto=format&fit=crop';
 
 export function ExperienceCard({ item, onPress }: { item: Experience; onPress?: () => void }) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -25,7 +24,7 @@ export function ExperienceCard({ item, onPress }: { item: Experience; onPress?: 
     <Animated.View style={{ transform: [{ scale }] }}>
       <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} style={styles.card}>
         <View style={styles.imgWrap}>
-          <Image source={{ uri: item.images?.[0] || FALLBACK }} style={styles.img} resizeMode="cover" />
+          <SmartImage uri={item.images?.[0]} seed={item.title || item.location} style={StyleSheet.absoluteFill} />
           <Gradient
             colors={['rgba(8,14,28,0.15)', 'rgba(8,14,28,0.02)', 'rgba(8,14,28,0.85)']}
             style={StyleSheet.absoluteFill}
@@ -50,7 +49,7 @@ export function ExperienceCard({ item, onPress }: { item: Experience; onPress?: 
 
           <View style={styles.imgFoot}>
             <AppText variant="h3" color={colors.white} numberOfLines={2}>
-              {item.title || 'Untitled experience'}
+              {cleanTitle(item.title, 'Untitled experience')}
             </AppText>
             {item.location ? (
               <View style={styles.locRow}>
