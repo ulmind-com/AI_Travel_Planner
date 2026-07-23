@@ -81,15 +81,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async u => {
+    const unsub = onAuthStateChanged(auth, u => {
       setFirebaseUser(u);
+      // Resolve navigation immediately once Firebase restores the session
+      // (instant, from AsyncStorage). The backend profile sync happens in the
+      // background so a cold/slow API never keeps the user on the splash.
+      setIsBootstrapping(false);
       if (u) {
-        await syncRegister(u);
-        await loadProfile();
+        syncRegister(u)
+          .then(() => loadProfile())
+          .catch(() => {});
       } else {
         setProfile(null);
       }
-      setIsBootstrapping(false);
     });
     return unsub;
   }, [loadProfile, syncRegister]);
