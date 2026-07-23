@@ -20,7 +20,8 @@ export interface EmergencyContact {
 
 export async function getAlerts(): Promise<SafetyAlert[]> {
   const { data } = await api.get('/safety/alerts');
-  return (data?.data ?? data ?? []) as SafetyAlert[];
+  // Backend responds { success, alerts }
+  return (data?.alerts ?? data?.data ?? []) as SafetyAlert[];
 }
 
 export async function reportAlert(input: {
@@ -36,7 +37,8 @@ export async function reportAlert(input: {
 
 export async function getContacts(): Promise<EmergencyContact[]> {
   const { data } = await api.get('/safety/contacts');
-  return (data?.data ?? data ?? []) as EmergencyContact[];
+  // Backend responds { success, contacts }
+  return (data?.contacts ?? data?.data ?? []) as EmergencyContact[];
 }
 
 export async function addContact(input: {
