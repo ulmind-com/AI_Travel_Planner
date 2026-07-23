@@ -19,7 +19,8 @@ import {
   Users,
   Wallet,
 } from 'lucide-react-native';
-import { AppText, Card } from '../../components/ui';
+import { AppText } from '../../components/ui';
+import { Gradient } from '../../components/ui/Gradient';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
@@ -64,54 +65,59 @@ export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
     <View style={styles.root}>
       <SafeAreaView edges={['top']} style={styles.safe}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          <View style={styles.topRow}>
-            <AppText variant="h1">Profile</AppText>
-            <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')}>
-              <Pencil size={18} color={colors.brand} />
-            </Pressable>
-          </View>
+          {/* Gradient hero */}
+          <Gradient colors={colors.brandGradient} style={styles.hero}>
+            <View pointerEvents="none" style={[styles.heroBlob, styles.heroBlobA]} />
+            <View pointerEvents="none" style={[styles.heroBlob, styles.heroBlobB]} />
 
-          <Card style={styles.profileCard} rounded="xxl">
-            <View style={styles.avatar}>
-              {avatar ? (
-                <Image source={{ uri: avatar }} style={styles.avatarImg} />
-              ) : (
-                <AppText variant="h1" color={colors.white}>
-                  {initial}
-                </AppText>
-              )}
+            <View style={styles.heroTop}>
+              <AppText variant="h3" color={colors.white}>
+                Profile
+              </AppText>
+              <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')} hitSlop={8}>
+                <Pencil size={17} color={colors.white} />
+              </Pressable>
             </View>
-            <View style={{ flex: 1 }}>
-              <AppText variant="h3">{name}</AppText>
+
+            <View style={styles.heroBody}>
+              <View style={styles.avatar}>
+                {avatar ? (
+                  <Image source={{ uri: avatar }} style={styles.avatarImg} />
+                ) : (
+                  <AppText variant="hero" color={colors.white}>
+                    {initial}
+                  </AppText>
+                )}
+              </View>
+              <AppText variant="h1" color={colors.white} style={{ marginTop: spacing.md }}>
+                {name}
+              </AppText>
               {email ? (
-                <AppText variant="caption" muted numberOfLines={1}>
+                <AppText variant="caption" color="rgba(255,255,255,0.85)" numberOfLines={1}>
                   {email}
                 </AppText>
               ) : null}
               {profile?.bio ? (
-                <AppText variant="caption" color={colors.ink600} numberOfLines={2} style={{ marginTop: 4 }}>
+                <AppText
+                  variant="caption"
+                  color="rgba(255,255,255,0.9)"
+                  center
+                  numberOfLines={2}
+                  style={styles.heroBio}>
                   {profile.bio}
                 </AppText>
               ) : null}
-            </View>
-          </Card>
 
-          {typeof trustScore === 'number' ? (
-            <Card style={styles.trustCard} rounded="xl">
-              <View style={styles.trustIcon}>
-                <ShieldCheck size={22} color={colors.success} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <AppText variant="bodyStrong">Trust score</AppText>
-                <AppText variant="caption" muted>
-                  Based on your activity & community standing
-                </AppText>
-              </View>
-              <AppText variant="h2" color={colors.success}>
-                {Math.round(trustScore)}
-              </AppText>
-            </Card>
-          ) : null}
+              {typeof trustScore === 'number' ? (
+                <View style={styles.trustPill}>
+                  <ShieldCheck size={15} color={colors.white} />
+                  <AppText variant="bodyStrong" color={colors.white}>
+                    Trust {Math.round(trustScore)}
+                  </AppText>
+                </View>
+              ) : null}
+            </View>
+          </Gradient>
 
           <View style={styles.menu}>
             {MENU.map((m, i) => {
@@ -153,52 +159,64 @@ export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   safe: { flex: 1 },
-  scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.sm },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.lg },
-  editBtn: {
-    width: 44,
+  scroll: { paddingBottom: spacing.sm },
+  hero: {
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xxxl,
+    borderBottomLeftRadius: radius.xxl,
+    borderBottomRightRadius: radius.xxl,
+    overflow: 'hidden',
+    marginBottom: spacing.xl,
+  },
+  heroBlob: { position: 'absolute', borderRadius: 200, backgroundColor: 'rgba(255,255,255,0.12)' },
+  heroBlobA: { width: 220, height: 220, top: -90, right: -60 },
+  heroBlobB: { width: 180, height: 180, bottom: -70, left: -50, backgroundColor: 'rgba(255,255,255,0.08)' },
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.xl,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.brandSoft,
+  },
+  editBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.22)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.lg,
-    backgroundColor: colors.white,
-    marginBottom: spacing.lg,
-  },
+  heroBody: { alignItems: 'center', paddingHorizontal: spacing.xl, marginTop: spacing.md },
+  heroBio: { marginTop: spacing.sm, paddingHorizontal: spacing.lg },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.brand,
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.35)',
   },
   avatarImg: { width: '100%', height: '100%' },
-  trustCard: {
+  trustPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    backgroundColor: colors.greenSoft,
-    marginBottom: spacing.xl,
-  },
-  trustIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
+    marginTop: spacing.lg,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   menu: {
     backgroundColor: colors.white,
     borderRadius: radius.xl,
     paddingHorizontal: spacing.lg,
+    marginHorizontal: spacing.xl,
     ...shadow.sm,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14 },
@@ -216,6 +234,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     marginTop: spacing.xl,
+    marginHorizontal: spacing.xl,
     height: 54,
     borderRadius: radius.pill,
     backgroundColor: colors.dangerSoft,
