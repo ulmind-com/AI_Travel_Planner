@@ -4,8 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, MessageSquarePlus } from 'lucide-react-native';
 import { AppText } from '../../components/ui';
+import { Gradient } from '../../components/ui/Gradient';
 import { colors } from '../../theme/colors';
-import { spacing } from '../../theme';
+import { radius, spacing } from '../../theme';
 import { getConversations, Conversation } from '../../services/messagingService';
 import { useAuth } from '../../context/AuthContext';
 import type { MainStackScreenProps } from '../../navigation/types';
@@ -54,15 +55,15 @@ export function ConversationsScreen({ navigation }: MainStackScreenProps<'Conver
             <Pressable
               style={styles.row}
               onPress={() => navigation.navigate('Chat', { conversationId: item._id, title })}>
-              <View style={styles.avatar}>
-                {item.groupImage ? (
-                  <Image source={{ uri: item.groupImage }} style={styles.avatarImg} />
-                ) : (
+              {item.groupImage ? (
+                <Image source={{ uri: item.groupImage }} style={styles.avatar} />
+              ) : (
+                <Gradient colors={colors.brandGradient} style={styles.avatar}>
                   <AppText variant="h3" color={colors.white}>
                     {title.charAt(0).toUpperCase()}
                   </AppText>
-                )}
-              </View>
+                </Gradient>
+              )}
               <View style={{ flex: 1 }}>
                 <AppText variant="bodyStrong" numberOfLines={1}>
                   {title}
@@ -107,16 +108,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   list: { paddingHorizontal: spacing.xl, paddingTop: spacing.md },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: spacing.md },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.lg,
+  },
   avatar: {
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: colors.brand,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  avatarImg: { width: '100%', height: '100%' },
   empty: { paddingTop: spacing.huge, alignItems: 'center', paddingHorizontal: spacing.xl },
 });
