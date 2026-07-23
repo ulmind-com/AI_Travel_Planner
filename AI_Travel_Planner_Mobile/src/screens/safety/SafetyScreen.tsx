@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Phone, Plus, ShieldAlert, Trash2, TriangleAlert, X } from 'lucide-react-native';
@@ -77,7 +85,11 @@ export function SafetyScreen({ navigation }: MainStackScreenProps<'Safety'>) {
         <View style={styles.circle} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
         {/* SOS */}
         <Pressable style={styles.sos} onPress={sendSOS} disabled={sosBusy}>
           <ShieldAlert size={30} color={colors.white} />
@@ -152,6 +164,7 @@ export function SafetyScreen({ navigation }: MainStackScreenProps<'Safety'>) {
         )}
         <View style={{ height: spacing.xxl }} />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -173,7 +186,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.md },
+  flex: { flex: 1 },
+  scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.huge },
   sos: {
     alignItems: 'center',
     gap: 6,

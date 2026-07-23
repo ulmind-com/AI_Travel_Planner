@@ -75,7 +75,7 @@ export function PostDetailScreen({ navigation, route }: MainStackScreenProps<'Po
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
         keyboardVerticalOffset={8}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.authorRow}>

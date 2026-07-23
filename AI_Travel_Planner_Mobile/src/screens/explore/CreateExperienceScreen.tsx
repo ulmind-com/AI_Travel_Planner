@@ -76,7 +76,7 @@ export function CreateExperienceScreen({ navigation }: MainStackScreenProps<'Cre
         <View style={styles.circle} />
       </View>
 
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <Input label="Title" placeholder="Sunrise trek at Mount Batur" value={title} onChangeText={setTitle} />
           <View style={{ height: spacing.lg }} />

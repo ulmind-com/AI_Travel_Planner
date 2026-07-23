@@ -146,7 +146,7 @@ export function PlannerScreen({ navigation, route }: MainStackScreenProps<'Plann
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        behavior="padding">
         <View style={styles.header}>
           <View style={styles.handle} />
           <View style={styles.headerRow}>

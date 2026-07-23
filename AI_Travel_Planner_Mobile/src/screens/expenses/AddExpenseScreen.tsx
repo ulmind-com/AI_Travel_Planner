@@ -79,7 +79,7 @@ export function AddExpenseScreen({ navigation }: MainStackScreenProps<'AddExpens
         <View style={styles.circle} />
       </View>
 
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <AppText variant="label" color={colors.ink600} style={styles.lbl}>
             TRAVEL GROUP

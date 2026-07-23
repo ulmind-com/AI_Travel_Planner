@@ -131,7 +131,7 @@ export function AIChatScreen({ navigation }: MainStackScreenProps<'AIChat'>) {
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
         keyboardVerticalOffset={8}>
         {loadingHistory ? (
           <View style={styles.center}>

@@ -69,7 +69,7 @@ export function ChatScreen({ navigation, route }: MainStackScreenProps<'Chat'>) 
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
         keyboardVerticalOffset={8}>
         <FlatList
           ref={listRef}

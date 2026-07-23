@@ -66,7 +66,7 @@ export function ReviewsScreen({ navigation }: MainStackScreenProps<'Reviews'>) {
         </Pressable>
       </View>
 
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <FlatList
           data={data ?? []}
           keyExtractor={(item, i) => item._id || String(i)}

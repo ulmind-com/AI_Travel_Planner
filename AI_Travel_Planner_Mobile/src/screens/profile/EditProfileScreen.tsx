@@ -70,7 +70,7 @@ export function EditProfileScreen({ navigation }: MainStackScreenProps<'EditProf
         <View style={styles.circle} />
       </View>
 
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <Pressable style={styles.avatarWrap} onPress={pickAvatar}>
             <View style={styles.avatar}>
