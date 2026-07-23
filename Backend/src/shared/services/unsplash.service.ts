@@ -79,13 +79,12 @@ export const resolveDestinationImage = async (
     const cleanTo = cleanQuery(to);
 
     // Ordered, de-duplicated candidate queries — most specific first.
+    // Kept short (max 3 API calls) to stay well within Unsplash rate limits;
+    // famous destinations resolve on the very first query.
     const candidates = [
         cleanName,
         cleanTo,
         cleanTo ? `${cleanTo} travel` : '',
-        cleanTo ? `${cleanTo} landscape` : '',
-        cleanName ? `${cleanName} tourism` : '',
-        'travel destination scenic',
     ]
         .map(cleanQuery)
         .filter((q, i, arr) => q.length > 1 && arr.indexOf(q) === i);
