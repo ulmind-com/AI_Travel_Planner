@@ -31,9 +31,11 @@ import {
 } from 'lucide-react-native';
 import { AppText } from '../../components/ui';
 import { Gradient } from '../../components/ui/Gradient';
+import { SmartImage } from '../../components/ui/SmartImage';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { getDestinationImages, savePlan } from '../../services/plansService';
+import { cleanTitle } from '../../lib/text';
 import { apiErrorMessage } from '../../lib/api';
 import { queryClient } from '../../lib/queryClient';
 import type { MainStackScreenProps } from '../../navigation/types';
@@ -69,7 +71,7 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
   const [saved, setSaved] = useState(false);
   const [msg, setMsg] = useState('');
 
-  const title = plan.name || plan.to;
+  const title = cleanTitle(plan.name || plan.to);
 
   // Real destination photos (public endpoint) for the gallery strip.
   const { data: gallery } = useQuery({
@@ -138,7 +140,7 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
           styles.hero,
           { transform: [{ translateY: heroTranslate }, { scale: heroScale }] },
         ]}>
-        <Image source={{ uri: plan.image_url || FALLBACK }} style={styles.heroImg} resizeMode="cover" />
+        <SmartImage uri={plan.image_url} seed={title} style={styles.heroImg} />
         <Gradient
           colors={['rgba(8,14,28,0.55)', 'rgba(8,14,28,0.05)', 'rgba(8,14,28,0.88)']}
           style={StyleSheet.absoluteFill}

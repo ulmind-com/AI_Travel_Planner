@@ -1,14 +1,13 @@
 import React, { useRef } from 'react';
-import { Animated, Image, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { CalendarDays, MapPin, Sparkles, Star, Users } from 'lucide-react-native';
 import { Gradient } from './ui/Gradient';
+import { SmartImage } from './ui/SmartImage';
 import { AppText } from './ui/AppText';
 import { colors } from '../theme/colors';
 import { radius, shadow, spacing } from '../theme';
+import { cleanTitle } from '../lib/text';
 import type { Plan } from '../types/plan';
-
-const FALLBACK =
-  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1000&auto=format&fit=crop';
 
 function currencySymbol(c?: string) {
   return c === 'EUR' ? '€' : c === 'INR' ? '₹' : c === 'GBP' ? '£' : '$';
@@ -25,7 +24,7 @@ function formatCost(plan: Plan): string | null {
 export function PlanCard({ plan, onPress }: { plan: Plan; onPress?: () => void }) {
   const scale = useRef(new Animated.Value(1)).current;
   const cost = formatCost(plan);
-  const title = plan.name || plan.to;
+  const title = cleanTitle(plan.name || plan.to);
 
   const pressIn = () =>
     Animated.spring(scale, { toValue: 0.975, useNativeDriver: true, speed: 40 }).start();
@@ -37,7 +36,7 @@ export function PlanCard({ plan, onPress }: { plan: Plan; onPress?: () => void }
       <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} style={styles.card}>
         {/* Image */}
         <View style={styles.imageWrap}>
-          <Image source={{ uri: plan.image_url || FALLBACK }} style={styles.image} resizeMode="cover" />
+          <SmartImage uri={plan.image_url} seed={title} style={StyleSheet.absoluteFill} />
           <Gradient
             colors={['rgba(8,14,28,0.18)', 'rgba(8,14,28,0.02)', 'rgba(8,14,28,0.82)']}
             style={StyleSheet.absoluteFill}
