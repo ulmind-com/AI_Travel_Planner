@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { CalendarDays, MapPin, Plus, Users } from 'lucide-react-native';
 import { Gradient } from '../../components/ui/Gradient';
-import { AppText } from '../../components/ui';
+import { AppText, EmptyState } from '../../components/ui';
 import { PostCard } from '../../components/PostCard';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
@@ -80,16 +80,16 @@ export function CommunityScreen({ navigation }: TabScreenProps<'Community'>) {
             <PostCard post={item} onPress={() => navigation.navigate('PostDetail', { post: item })} />
           )}
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <AppText variant="h3" center>
-                {isLoading ? 'Loading community…' : 'No posts yet'}
-              </AppText>
-              {!isLoading ? (
-                <AppText variant="body" muted center style={{ marginTop: 6 }}>
-                  Be the first to share your travel story.
-                </AppText>
-              ) : null}
-            </View>
+            <EmptyState
+              loading={isLoading}
+              loadingLabel="Loading community…"
+              icon={<Users size={30} color={colors.brand} />}
+              title="No posts yet"
+              subtitle="Be the first to share a travel story, tip or question."
+              actionLabel="Create post"
+              actionIcon={<Plus size={18} color={colors.white} />}
+              onAction={() => navigation.navigate('CreatePost')}
+            />
           }
         />
       </SafeAreaView>

@@ -3,7 +3,7 @@ import { FlatList, Image, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Check, Users } from 'lucide-react-native';
-import { AppText, Card } from '../../components/ui';
+import { AppText, Card, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { getGroups, joinGroup } from '../../services/communityService';
@@ -81,11 +81,13 @@ export function GroupsScreen({ navigation }: MainStackScreenProps<'Groups'>) {
           </Card>
         )}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <AppText variant="h3" center>
-              {isLoading ? 'Loading groups…' : 'No groups yet'}
-            </AppText>
-          </View>
+          <EmptyState
+            loading={isLoading}
+            loadingLabel="Loading groups…"
+            icon={<Users size={30} color={colors.brand} />}
+            title="No travel groups yet"
+            subtitle="Groups let you plan trips and split expenses together."
+          />
         }
       />
     </SafeAreaView>

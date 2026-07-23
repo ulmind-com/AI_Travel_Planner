@@ -2,8 +2,8 @@ import React from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react-native';
-import { AppText } from '../../components/ui';
+import { Compass, Plus, Search } from 'lucide-react-native';
+import { AppText, EmptyState } from '../../components/ui';
 import { ExperienceCard } from '../../components/ExperienceCard';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
@@ -49,16 +49,16 @@ export function ExploreScreen({ navigation }: TabScreenProps<'Explore'>) {
             />
           )}
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <AppText variant="h3" center>
-                {isLoading ? 'Loading experiences…' : 'No experiences yet'}
-              </AppText>
-              {!isLoading ? (
-                <AppText variant="body" muted center style={{ marginTop: 6 }}>
-                  Share your first travel experience.
-                </AppText>
-              ) : null}
-            </View>
+            <EmptyState
+              loading={isLoading}
+              loadingLabel="Loading experiences…"
+              icon={<Compass size={30} color={colors.brand} />}
+              title="No experiences yet"
+              subtitle="Share your first travel experience with the tap of the + button."
+              actionLabel="Share experience"
+              actionIcon={<Plus size={18} color={colors.white} />}
+              onAction={() => navigation.navigate('CreateExperience')}
+            />
           }
         />
       </SafeAreaView>

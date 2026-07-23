@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Send } from 'lucide-react-native';
-import { AppText } from '../../components/ui';
+import { ArrowLeft, MessageCircle, Send } from 'lucide-react-native';
+import { AppText, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/typography';
 import { radius, spacing } from '../../theme';
@@ -90,11 +90,12 @@ export function ChatScreen({ navigation, route }: MainStackScreenProps<'Chat'>) 
             );
           }}
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <AppText variant="body" muted center>
-                No messages yet — say hello
-              </AppText>
-            </View>
+            <EmptyState
+              compact
+              icon={<MessageCircle size={30} color={colors.brand} />}
+              title="Say hello"
+              subtitle="This is the start of your conversation."
+            />
           }
         />
 
