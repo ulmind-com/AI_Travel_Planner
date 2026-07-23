@@ -3,7 +3,7 @@ import { FlatList, Image, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, MessageSquarePlus } from 'lucide-react-native';
-import { AppText } from '../../components/ui';
+import { AppText, EmptyState } from '../../components/ui';
 import { Gradient } from '../../components/ui/Gradient';
 import { colors } from '../../theme/colors';
 import { radius, spacing } from '../../theme';
@@ -76,14 +76,13 @@ export function ConversationsScreen({ navigation }: MainStackScreenProps<'Conver
           );
         }}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <AppText variant="h3" center>
-              {isLoading ? 'Loading…' : 'No messages yet'}
-            </AppText>
-            <AppText variant="body" muted center style={{ marginTop: 6 }}>
-              Start a chat from a traveler's profile.
-            </AppText>
-          </View>
+          <EmptyState
+            loading={isLoading}
+            loadingLabel="Loading messages…"
+            icon={<MessageSquarePlus size={30} color={colors.brand} />}
+            title="No messages yet"
+            subtitle="Start a conversation from a traveler's profile or your friends list."
+          />
         }
       />
     </SafeAreaView>

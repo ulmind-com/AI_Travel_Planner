@@ -2,8 +2,8 @@ import React from 'react';
 import { FlatList, Image, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, MessageCircle } from 'lucide-react-native';
-import { AppText } from '../../components/ui';
+import { ArrowLeft, MessageCircle, Users } from 'lucide-react-native';
+import { AppText, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme';
 import { getFriends } from '../../services/socialService';
@@ -63,14 +63,14 @@ export function FriendsScreen({ navigation }: MainStackScreenProps<'Friends'>) {
           );
         }}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <AppText variant="h3" center>
-              {isLoading ? 'Loading…' : 'No friends yet'}
-            </AppText>
-            <AppText variant="body" muted center style={{ marginTop: 6 }}>
-              Find travelers and connect from the search screen.
-            </AppText>
-          </View>
+          <EmptyState
+            loading={isLoading}
+            loadingLabel="Loading friends…"
+            icon={<Users size={30} color={colors.purple} />}
+            gradient={[colors.purpleSoft, colors.sky100]}
+            title="No friends yet"
+            subtitle="Find fellow travelers and connect from the search screen."
+          />
         }
       />
     </SafeAreaView>

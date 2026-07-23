@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Bell, CheckCheck, Heart, MessageCircle, UserPlus } from 'lucide-react-native';
-import { AppText } from '../../components/ui';
+import { AppText, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius, spacing } from '../../theme';
 import {
@@ -80,12 +80,14 @@ export function NotificationsScreen({ navigation }: MainStackScreenProps<'Notifi
           );
         }}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Bell size={30} color={colors.ink300} />
-            <AppText variant="h3" center style={{ marginTop: spacing.md }}>
-              {isLoading ? 'Loading…' : 'No notifications'}
-            </AppText>
-          </View>
+          <EmptyState
+            loading={isLoading}
+            loadingLabel="Loading notifications…"
+            icon={<Bell size={30} color={colors.gold} />}
+            gradient={[colors.goldSoft, colors.sky100]}
+            title="You're all caught up"
+            subtitle="Likes, comments, follows and messages will show up here."
+          />
         }
       />
     </SafeAreaView>

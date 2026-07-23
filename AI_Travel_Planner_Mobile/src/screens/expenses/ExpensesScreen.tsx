@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Plus, Receipt, Wallet } from 'lucide-react-native';
-import { AppText, Card } from '../../components/ui';
+import { AppText, Card, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { getUserExpenses } from '../../services/expensesService';
@@ -76,14 +76,14 @@ export function ExpensesScreen({ navigation }: MainStackScreenProps<'Expenses'>)
           );
         }}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <AppText variant="h3" center>
-              {isLoading ? 'Loading…' : 'No expenses yet'}
-            </AppText>
-            <AppText variant="body" muted center style={{ marginTop: 6 }}>
-              Group trip expenses and settle-ups will appear here.
-            </AppText>
-          </View>
+          <EmptyState
+            loading={isLoading}
+            loadingLabel="Loading expenses…"
+            icon={<Receipt size={30} color={colors.green} />}
+            gradient={[colors.greenSoft, colors.sky100]}
+            title="No expenses yet"
+            subtitle="Group trip expenses and settle-ups will appear here."
+          />
         }
       />
     </SafeAreaView>

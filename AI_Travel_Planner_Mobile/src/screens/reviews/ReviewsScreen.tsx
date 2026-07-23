@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Plus, Star, X } from 'lucide-react-native';
-import { AppText, Button, Card } from '../../components/ui';
+import { AppText, Button, Card, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/typography';
 import { radius, shadow, spacing } from '../../theme';
@@ -134,11 +134,14 @@ export function ReviewsScreen({ navigation }: MainStackScreenProps<'Reviews'>) {
             </Card>
           )}
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <AppText variant="body" muted center>
-                {isLoading ? 'Loading reviews…' : 'No reviews yet. Be the first!'}
-              </AppText>
-            </View>
+            <EmptyState
+              loading={isLoading}
+              loadingLabel="Loading reviews…"
+              icon={<Star size={30} color={colors.gold} fill={colors.gold} />}
+              gradient={[colors.goldSoft, colors.sky100]}
+              title="No reviews yet"
+              subtitle="Be the first to share your experience — tap + above."
+            />
           }
         />
       </KeyboardAvoidingView>

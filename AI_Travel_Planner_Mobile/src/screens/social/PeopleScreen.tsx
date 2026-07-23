@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FlatList, Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Search, Shield, UserPlus, Users } from 'lucide-react-native';
-import { AppText } from '../../components/ui';
+import { AppText, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/typography';
 import { radius, spacing } from '../../theme';
@@ -121,15 +121,17 @@ export function PeopleScreen({ navigation }: MainStackScreenProps<'People'>) {
           );
         }}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <AppText variant="body" muted center>
-              {loading
-                ? 'Searching…'
-                : q.trim().length >= 2
-                ? 'No travelers found'
-                : 'Find fellow travelers by name'}
-            </AppText>
-          </View>
+          <EmptyState
+            loading={loading}
+            loadingLabel="Searching…"
+            icon={<Search size={30} color={colors.brand} />}
+            title={q.trim().length >= 2 ? 'No travelers found' : 'Find fellow travelers'}
+            subtitle={
+              q.trim().length >= 2
+                ? 'Try a different name or username.'
+                : 'Search by name or username to connect, follow and chat.'
+            }
+          />
         }
       />
     </SafeAreaView>

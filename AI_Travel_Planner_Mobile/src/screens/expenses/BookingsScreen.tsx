@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Hotel, Ticket } from 'lucide-react-native';
-import { AppText, Card } from '../../components/ui';
+import { AppText, Card, EmptyState } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { getMyBookings } from '../../services/miscService';
@@ -55,15 +55,14 @@ export function BookingsScreen({ navigation }: MainStackScreenProps<'Bookings'>)
           </Card>
         )}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ticket size={30} color={colors.ink300} />
-            <AppText variant="h3" center style={{ marginTop: spacing.md }}>
-              {isLoading ? 'Loading…' : 'No bookings yet'}
-            </AppText>
-            <AppText variant="body" muted center style={{ marginTop: 6 }}>
-              Your hotel & trip bookings will appear here.
-            </AppText>
-          </View>
+          <EmptyState
+            loading={isLoading}
+            loadingLabel="Loading bookings…"
+            icon={<Ticket size={30} color={colors.coral} />}
+            gradient={[colors.coralSoft, colors.sky100]}
+            title="No bookings yet"
+            subtitle="Your hotel and trip bookings will appear here once you book."
+          />
         }
       />
     </SafeAreaView>
