@@ -8,7 +8,7 @@
  */
 
 // Live deployed backend (Render).
-export const API_BASE_URL = 'https://ai-travel-planner-0ddm.onrender.com';
+export const API_BASE_URL = 'https://ai-travel-planner-5tp6.onrender.com';
 
 /** All backend routes are namespaced under /api/v1 */
 export const API_PREFIX = '/api/v1';
