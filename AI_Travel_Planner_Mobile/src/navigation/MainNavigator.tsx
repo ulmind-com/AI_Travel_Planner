@@ -19,6 +19,7 @@ import { ChatScreen } from '../screens/messaging/ChatScreen';
 import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
 import { SafetyScreen } from '../screens/safety/SafetyScreen';
 import { TrainsScreen } from '../screens/trains/TrainsScreen';
+import { HotelsScreen } from '../screens/planning/HotelsScreen';
 import { ExpensesScreen } from '../screens/expenses/ExpensesScreen';
 import { AddExpenseScreen } from '../screens/expenses/AddExpenseScreen';
 import { BookingsScreen } from '../screens/expenses/BookingsScreen';
@@ -70,6 +71,7 @@ export function MainNavigator() {
       />
       <Stack.Screen name="Safety" component={SafetyScreen} />
       <Stack.Screen name="Trains" component={TrainsScreen} />
+      <Stack.Screen name="Hotels" component={HotelsScreen} />
       <Stack.Screen name="Expenses" component={ExpensesScreen} />
       <Stack.Screen
         name="AddExpense"

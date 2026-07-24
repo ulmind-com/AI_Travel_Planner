@@ -42,6 +42,16 @@ export type MainStackParamList = {
   EditProfile: undefined;
   Safety: undefined;
   Trains: undefined;
+  Hotels: { destination?: string } | undefined;
+  Flights: undefined;
+  Tours: undefined;
+  Stories: undefined;
+  GroupDetail: { groupId: string; name?: string };
+  SharedPlan: { id: string };
+  SocialSearch: { q?: string } | undefined;
+  HowItWorks: undefined;
+  Partners: undefined;
+  Press: undefined;
   Expenses: undefined;
   AddExpense: undefined;
   Bookings: undefined;
