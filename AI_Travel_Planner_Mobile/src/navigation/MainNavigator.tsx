@@ -11,6 +11,7 @@ import { GroupsScreen } from '../screens/community/GroupsScreen';
 import { ExperienceDetailScreen } from '../screens/explore/ExperienceDetailScreen';
 import { CreateExperienceScreen } from '../screens/explore/CreateExperienceScreen';
 import { PeopleScreen } from '../screens/social/PeopleScreen';
+import { PublicProfileScreen } from '../screens/social/PublicProfileScreen';
 import { FriendsScreen } from '../screens/social/FriendsScreen';
 import { NotificationsScreen } from '../screens/social/NotificationsScreen';
 import { ConversationsScreen } from '../screens/messaging/ConversationsScreen';
@@ -53,6 +54,7 @@ export function MainNavigator() {
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="People" component={PeopleScreen} />
+      <Stack.Screen name="PublicProfile" component={PublicProfileScreen} />
       <Stack.Screen name="Friends" component={FriendsScreen} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen name="Conversations" component={ConversationsScreen} />

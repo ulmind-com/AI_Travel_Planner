@@ -42,6 +42,7 @@ export type MainStackParamList = {
   Bookings: undefined;
   Reviews: undefined;
   TravelIntel: { destination?: string } | undefined;
+  PublicProfile: { firebaseUid: string; name?: string };
 };
 
 export type RootStackParamList = {

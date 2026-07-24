@@ -77,7 +77,13 @@ export function CommunityScreen({ navigation }: TabScreenProps<'Community'>) {
             </View>
           }
           renderItem={({ item }) => (
-            <PostCard post={item} onPress={() => navigation.navigate('PostDetail', { post: item })} />
+            <PostCard
+              post={item}
+              onPress={() => navigation.navigate('PostDetail', { post: item })}
+              onAuthorPress={(firebaseUid, name) =>
+                navigation.navigate('PublicProfile', { firebaseUid, name })
+              }
+            />
           )}
           ListEmptyComponent={
             <EmptyState

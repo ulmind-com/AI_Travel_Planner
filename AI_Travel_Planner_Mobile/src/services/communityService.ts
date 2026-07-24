@@ -109,3 +109,26 @@ export async function joinGroup(groupId: string): Promise<void> {
 export async function toggleFollow(targetFirebaseUid: string): Promise<void> {
   await api.post('/community/follow', { targetFirebaseUid });
 }
+
+export interface PublicProfile {
+  profile: {
+    firebaseUid: string;
+    username?: string;
+    fullname?: string;
+    profilepicture?: string;
+    bio?: string;
+    coverImage?: string;
+    country?: string;
+    followersCount?: number;
+    followingCount?: number;
+    isFollowing?: boolean;
+    createdAt?: string;
+  };
+  activity: { posts?: CommunityPost[]; stories?: any[]; savedPlans?: any[] };
+}
+
+/** Public profile + activity of any traveler by their Firebase UID. */
+export async function getPublicProfile(firebaseUid: string): Promise<PublicProfile> {
+  const { data } = await api.get(`/community/profile/${firebaseUid}`);
+  return (data?.data ?? data) as PublicProfile;
+}

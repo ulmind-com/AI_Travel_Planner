@@ -73,7 +73,12 @@ export function PeopleScreen({ navigation }: MainStackScreenProps<'People'>) {
           const name = item.username || item.fullname || 'Traveler';
           const isFollowed = followed[id];
           return (
-            <View style={styles.row}>
+            <Pressable
+              style={styles.row}
+              onPress={() =>
+                item.firebaseUid &&
+                navigation.navigate('PublicProfile', { firebaseUid: item.firebaseUid, name })
+              }>
               <View style={styles.avatar}>
                 {item.profilepicture || item.profileImage ? (
                   <Image source={{ uri: item.profilepicture || item.profileImage }} style={styles.avatarImg} />
@@ -117,7 +122,7 @@ export function PeopleScreen({ navigation }: MainStackScreenProps<'People'>) {
                   </>
                 )}
               </Pressable>
-            </View>
+            </Pressable>
           );
         }}
         ListEmptyComponent={

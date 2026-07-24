@@ -23,11 +23,20 @@ function timeAgo(iso?: string): string {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }
 
-export function PostCard({ post, onPress }: { post: CommunityPost; onPress?: () => void }) {
+export function PostCard({
+  post,
+  onPress,
+  onAuthorPress,
+}: {
+  post: CommunityPost;
+  onPress?: () => void;
+  onAuthorPress?: (firebaseUid: string, name: string) => void;
+}) {
   const { firebaseUser } = useAuth();
   const uid = firebaseUser?.uid;
   const author = (typeof post.userId === 'object' ? post.userId : undefined) as PostAuthor | undefined;
   const name = author?.username || author?.fullname || 'Traveler';
+  const authorUid = author?.firebaseUid || post.firebaseUid;
 
   const [likes, setLikes] = useState<string[]>(post.likes ?? []);
   const liked = uid ? likes.includes(uid) : false;
@@ -54,25 +63,30 @@ export function PostCard({ post, onPress }: { post: CommunityPost; onPress?: () 
     <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       {/* Author */}
       <View style={styles.head}>
-        <View style={styles.avatarRing}>
-          <View style={styles.avatar}>
-            {author?.profilepicture ? (
-              <Image source={{ uri: author.profilepicture }} style={styles.avatarImg} />
-            ) : (
-              <AppText variant="bodyStrong" color={colors.white}>
-                {name.charAt(0).toUpperCase()}
-              </AppText>
-            )}
+        <Pressable
+          style={styles.authorTap}
+          onPress={() => authorUid && onAuthorPress?.(authorUid, name)}
+          disabled={!authorUid || !onAuthorPress}>
+          <View style={styles.avatarRing}>
+            <View style={styles.avatar}>
+              {author?.profilepicture ? (
+                <Image source={{ uri: author.profilepicture }} style={styles.avatarImg} />
+              ) : (
+                <AppText variant="bodyStrong" color={colors.white}>
+                  {name.charAt(0).toUpperCase()}
+                </AppText>
+              )}
+            </View>
           </View>
-        </View>
-        <View style={{ flex: 1 }}>
-          <AppText variant="bodyStrong" numberOfLines={1}>
-            {name}
-          </AppText>
-          <AppText variant="label" muted>
-            {timeAgo(post.createdAt)}
-          </AppText>
-        </View>
+          <View style={{ flex: 1 }}>
+            <AppText variant="bodyStrong" numberOfLines={1}>
+              {name}
+            </AppText>
+            <AppText variant="label" muted>
+              {timeAgo(post.createdAt)}
+            </AppText>
+          </View>
+        </Pressable>
         {post.category ? (
           <View style={styles.categoryPill}>
             <AppText variant="label" color={colors.brandDark}>
@@ -175,6 +189,7 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   pressed: { opacity: 0.97 },
+  authorTap: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   head: {
     flexDirection: 'row',
     alignItems: 'center',
