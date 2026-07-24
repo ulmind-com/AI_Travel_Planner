@@ -34,7 +34,7 @@ import { Gradient } from '../../components/ui/Gradient';
 import { SmartImage } from '../../components/ui/SmartImage';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
-import { getDestinationImages, savePlan } from '../../services/plansService';
+import { getDestinationImages, getSavedPlans, savePlan, unsavePlan } from '../../services/plansService';
 import { cleanTitle } from '../../lib/text';
 import { apiErrorMessage } from '../../lib/api';
 import { queryClient } from '../../lib/queryClient';
@@ -68,8 +68,8 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const [saved, setSaved] = useState(false);
   const [msg, setMsg] = useState('');
+  const [override, setOverride] = useState<boolean | null>(null);
 
   const title = cleanTitle(plan.name || plan.to);
 
@@ -80,15 +80,46 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
     staleTime: 30 * 60 * 1000,
   });
 
+  // Is this plan already in the user's saved (liked) trips?
+  const { data: savedPlans } = useQuery({ queryKey: ['saved-plans'], queryFn: getSavedPlans });
+  const serverSaved = !!savedPlans?.some(p => p._id === plan._id);
+  const saved = override ?? serverSaved;
+
+  const afterChange = () => {
+    queryClient.invalidateQueries({ queryKey: ['saved-plans'] });
+  };
+
   const saveMut = useMutation({
     mutationFn: () => savePlan(plan._id as string),
+    onMutate: () => setOverride(true),
     onSuccess: () => {
-      setSaved(true);
-      setMsg('Saved to your favorites');
-      queryClient.invalidateQueries({ queryKey: ['my-plans'] });
+      setMsg('Saved to your trips');
+      afterChange();
     },
-    onError: e => setMsg(apiErrorMessage(e)),
+    onError: e => {
+      setOverride(false);
+      setMsg(apiErrorMessage(e));
+    },
   });
+
+  const unsaveMut = useMutation({
+    mutationFn: () => unsavePlan(plan._id as string),
+    onMutate: () => setOverride(false),
+    onSuccess: () => {
+      setMsg('Removed from saved trips');
+      afterChange();
+    },
+    onError: e => {
+      setOverride(true);
+      setMsg(apiErrorMessage(e));
+    },
+  });
+
+  const busy = saveMut.isPending || unsaveMut.isPending;
+  const toggleSave = () => {
+    if (!plan._id || busy) return;
+    saved ? unsaveMut.mutate() : saveMut.mutate();
+  };
 
   const bb = plan.budget_breakdown;
   const total = Number(bb?.total ?? plan.cost ?? 0);
@@ -467,12 +498,9 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
           <Pressable style={styles.shareBtn} onPress={onShare}>
             <Share2 size={20} color={colors.ink800} />
           </Pressable>
-          <Pressable
-            style={styles.saveWrap}
-            onPress={() => !saved && plan._id && saveMut.mutate()}
-            disabled={saved || saveMut.isPending}>
+          <Pressable style={styles.saveWrap} onPress={toggleSave} disabled={busy}>
             <Gradient
-              colors={saved ? [colors.green, colors.green] : colors.brandGradient}
+              colors={saved ? [colors.green, '#28A745'] : colors.brandGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.saveBtn}>
@@ -482,7 +510,7 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
                 <Bookmark size={20} color={colors.white} />
               )}
               <AppText variant="button" color={colors.white}>
-                {saveMut.isPending ? 'Saving…' : saved ? 'Saved' : 'Save this trip'}
+                {busy ? 'Saving…' : saved ? 'Saved · tap to remove' : 'Save this trip'}
               </AppText>
             </Gradient>
           </Pressable>

@@ -49,7 +49,7 @@ export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
     tint: string;
     go: () => void;
   }[] = [
-    { key: 'trips', label: 'Saved trips', icon: Compass, tint: colors.brand, go: () => navigation.navigate('Trips') },
+    { key: 'trips', label: 'Saved trips', icon: Compass, tint: colors.brand, go: () => navigation.navigate('Trips', { view: 'saved' }) },
     { key: 'expenses', label: 'Expense splits', icon: Wallet, tint: colors.green, go: () => navigation.navigate('Expenses') },
     { key: 'bookings', label: 'My bookings', icon: Ticket, tint: colors.coral, go: () => navigation.navigate('Bookings') },
     { key: 'trains', label: 'Train bookings', icon: Train, tint: colors.blueChip, go: () => navigation.navigate('Trains') },

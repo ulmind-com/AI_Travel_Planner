@@ -29,12 +29,21 @@ export async function getPlanById(id: string): Promise<Plan | null> {
   return (data?.data ?? data ?? null) as Plan | null;
 }
 
+/**
+ * Saved / favorite trips use the liked-plans system (user.likedPlans), which
+ * has a proper GET that returns the full plan objects — unlike /plans/:id/save.
+ */
+export async function getSavedPlans(): Promise<Plan[]> {
+  const { data } = await api.get('/liked-plans');
+  return (data?.likedPlans ?? data?.data ?? []) as Plan[];
+}
+
 export async function savePlan(planId: string): Promise<void> {
-  await api.post(`/plans/${planId}/save`);
+  await api.post(`/liked-plans/${planId}`);
 }
 
 export async function unsavePlan(planId: string): Promise<void> {
-  await api.delete(`/plans/${planId}/save`);
+  await api.delete(`/liked-plans/${planId}`);
 }
 
 /** Public: fetch a batch of destination images (Unsplash). */

@@ -14,7 +14,7 @@ export type TabParamList = {
   Home: undefined;
   Explore: undefined;
   Community: undefined;
-  Trips: undefined;
+  Trips: { view?: 'all' | 'saved' } | undefined;
   Profile: undefined;
 };
 
