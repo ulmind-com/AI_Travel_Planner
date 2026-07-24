@@ -7,6 +7,7 @@ import { Gradient } from '../components/ui/Gradient';
 import { colors } from '../theme/colors';
 import { shadow } from '../theme';
 import { AppText } from '../components/ui/AppText';
+import { tapLight } from '../lib/haptics';
 
 const ICONS: Record<string, React.ComponentType<any>> = {
   Home,
@@ -36,7 +37,10 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
                 target: route.key,
                 canPreventDefault: true,
               });
-              if (!focused && !event.defaultPrevented) navigation.navigate(route.name);
+              if (!focused && !event.defaultPrevented) {
+                tapLight();
+                navigation.navigate(route.name);
+              }
             };
 
             return (

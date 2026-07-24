@@ -11,6 +11,7 @@ import { Gradient as LinearGradient } from './Gradient';
 import { colors } from '../../theme/colors';
 import { radius, shadow } from '../../theme';
 import { AppText } from './AppText';
+import { tapMedium } from '../../lib/haptics';
 
 type Variant = 'primary' | 'ink' | 'glass' | 'ghost' | 'outline';
 type Size = 'lg' | 'md' | 'sm';
@@ -42,6 +43,12 @@ export function Button({
 }: Props) {
   const scale = useRef(new Animated.Value(1)).current;
   const isDisabled = disabled || loading;
+
+  const handlePress = () => {
+    if (isDisabled) return;
+    tapMedium();
+    onPress?.();
+  };
 
   const pressIn = () =>
     Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
@@ -80,7 +87,7 @@ export function Button({
   return (
     <Animated.View style={[{ transform: [{ scale }] }, fullWidth && styles.full, style]}>
       <Pressable
-        onPress={onPress}
+        onPress={handlePress}
         onPressIn={pressIn}
         onPressOut={pressOut}
         disabled={isDisabled}

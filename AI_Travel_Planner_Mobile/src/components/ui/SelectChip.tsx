@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme';
 import { AppText } from './AppText';
+import { selectionTick } from '../../lib/haptics';
 
 interface Props {
   label: string;
@@ -16,7 +17,10 @@ interface Props {
 export function SelectChip({ label, selected, onPress, icon, style }: Props) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        selectionTick();
+        onPress?.();
+      }}
       style={[styles.chip, selected ? styles.selected : styles.idle, style]}>
       {icon ? <View style={styles.icon}>{icon}</View> : null}
       <AppText variant="bodyStrong" color={selected ? colors.white : colors.ink700}>

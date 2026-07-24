@@ -36,6 +36,7 @@ import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { getDestinationImages, getSavedPlans, savePlan, unsavePlan } from '../../services/plansService';
 import { cleanTitle } from '../../lib/text';
+import { tapMedium, notifySuccess } from '../../lib/haptics';
 import { apiErrorMessage } from '../../lib/api';
 import { queryClient } from '../../lib/queryClient';
 import type { MainStackScreenProps } from '../../navigation/types';
@@ -94,6 +95,7 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
     onMutate: () => setOverride(true),
     onSuccess: () => {
       setMsg('Saved to your trips');
+      notifySuccess();
       afterChange();
     },
     onError: e => {
@@ -118,6 +120,7 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
   const busy = saveMut.isPending || unsaveMut.isPending;
   const toggleSave = () => {
     if (!plan._id || busy) return;
+    tapMedium();
     saved ? unsaveMut.mutate() : saveMut.mutate();
   };
 

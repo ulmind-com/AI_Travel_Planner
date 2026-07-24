@@ -7,6 +7,7 @@ import { colors } from '../theme/colors';
 import { radius, shadow, spacing } from '../theme';
 import { useAuth } from '../context/AuthContext';
 import { toggleLike } from '../services/communityService';
+import { tapLight } from '../lib/haptics';
 import type { CommunityPost, PostAuthor } from '../types/community';
 
 function timeAgo(iso?: string): string {
@@ -34,6 +35,7 @@ export function PostCard({ post, onPress }: { post: CommunityPost; onPress?: () 
 
   const onLike = async () => {
     if (!uid) return;
+    tapLight();
     Animated.sequence([
       Animated.spring(heart, { toValue: 1.35, useNativeDriver: true, speed: 50 }),
       Animated.spring(heart, { toValue: 1, useNativeDriver: true, speed: 30 }),
