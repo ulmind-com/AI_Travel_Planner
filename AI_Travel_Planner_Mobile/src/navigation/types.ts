@@ -33,7 +33,12 @@ export type MainStackParamList = {
   Friends: undefined;
   Notifications: undefined;
   Conversations: undefined;
-  Chat: { conversationId: string; title?: string };
+  Chat: {
+    conversationId: string;
+    title?: string;
+    recipientFirebaseUid?: string;
+    recipientAvatar?: string;
+  };
   EditProfile: undefined;
   Safety: undefined;
   Trains: undefined;

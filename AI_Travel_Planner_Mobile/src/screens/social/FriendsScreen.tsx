@@ -20,7 +20,11 @@ export function FriendsScreen({ navigation }: MainStackScreenProps<'Friends'>) {
     if (!firebaseUid) return;
     try {
       const conv = await getOrCreateConversation(firebaseUid);
-      navigation.navigate('Chat', { conversationId: conv._id, title: name });
+      navigation.navigate('Chat', {
+        conversationId: conv._id,
+        title: name,
+        recipientFirebaseUid: firebaseUid,
+      });
     } catch {}
   };
 

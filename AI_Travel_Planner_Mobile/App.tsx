@@ -9,6 +9,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from './src/context/AuthContext';
+import { SocketProvider } from './src/context/SocketContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { queryClient } from './src/lib/queryClient';
 
@@ -41,7 +42,9 @@ export default function App() {
         <StatusBar style="dark" />
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <RootNavigator />
+            <SocketProvider>
+              <RootNavigator />
+            </SocketProvider>
           </AuthProvider>
         </QueryClientProvider>
       </SafeAreaProvider>

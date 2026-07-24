@@ -13,7 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#E4F3FF"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ulmind.aitravelplanner"
@@ -31,6 +33,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font", "expo-image-picker"]
+    "plugins": [
+      "expo-font",
+      "expo-image-picker",
+      "expo-secure-store"
+    ]
   }
 }
