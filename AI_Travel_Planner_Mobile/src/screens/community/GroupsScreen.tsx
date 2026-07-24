@@ -43,7 +43,7 @@ export function GroupsScreen({ navigation }: MainStackScreenProps<'Groups'>) {
 
       <FlatList
         data={data ?? []}
-        keyExtractor={item => item._id}
+        keyExtractor={(item, i) => item._id ?? String(i)}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         refreshing={isRefetching}

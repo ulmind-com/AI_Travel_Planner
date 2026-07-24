@@ -218,7 +218,7 @@ export function TrainsScreen({ navigation }: MainStackScreenProps<'Trains'>) {
       ) : (
         <FlatList
           data={bookings ?? []}
-          keyExtractor={item => item._id}
+          keyExtractor={(item, i) => item._id ?? String(i)}
           contentContainerStyle={styles.list}
           onRefresh={refetch}
           refreshing={false}

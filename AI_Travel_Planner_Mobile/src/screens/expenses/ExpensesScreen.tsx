@@ -31,7 +31,7 @@ export function ExpensesScreen({ navigation }: MainStackScreenProps<'Expenses'>)
 
       <FlatList
         data={data ?? []}
-        keyExtractor={item => item._id}
+        keyExtractor={(item, i) => item._id ?? String(i)}
         contentContainerStyle={styles.list}
         refreshing={isRefetching}
         onRefresh={refetch}

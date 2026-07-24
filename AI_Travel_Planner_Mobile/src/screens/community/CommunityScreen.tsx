@@ -63,7 +63,7 @@ export function CommunityScreen({ navigation }: TabScreenProps<'Community'>) {
 
         <FlatList
           data={data ?? []}
-          keyExtractor={item => item._id}
+          keyExtractor={(item, i) => item._id ?? String(i)}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           refreshing={isRefetching}
@@ -121,12 +121,12 @@ function StoriesRail({ stories, onAdd }: { stories: Story[]; onAdd: () => void }
           Your story
         </AppText>
       </Pressable>
-      {stories.map(s => {
+      {stories.map((s, si) => {
         const author = typeof s.userId === 'object' ? s.userId : undefined;
         const name = author?.username || author?.fullname || 'Story';
         const img = (s as any).images?.[0] || s.image || s.mediaUrl;
         return (
-          <Pressable key={s._id} style={styles.storyItem}>
+          <Pressable key={s._id ?? si} style={styles.storyItem}>
             <Gradient colors={colors.brandGradient} style={styles.storyRing}>
               <View style={styles.storyInner}>
                 {img ? (
@@ -155,8 +155,8 @@ function EventsRail({ events }: { events: CommunityEvent[] }) {
         Upcoming events
       </AppText>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.md }}>
-        {events.map(e => (
-          <View key={e._id} style={styles.eventCard}>
+        {events.map((e, ei) => (
+          <View key={e._id ?? ei} style={styles.eventCard}>
             <Gradient colors={['#7C6CF0', '#3A9BF0']} style={styles.eventThumb}>
               <CalendarDays size={22} color={colors.white} />
             </Gradient>

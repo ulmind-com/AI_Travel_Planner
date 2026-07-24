@@ -21,7 +21,7 @@ export function ExploreScreen({ navigation }: TabScreenProps<'Explore'>) {
       <SafeAreaView edges={['top']} style={styles.safe}>
         <FlatList
           data={data ?? []}
-          keyExtractor={item => item._id}
+          keyExtractor={(item, i) => item._id ?? String(i)}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           refreshing={isRefetching}
