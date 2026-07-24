@@ -1,5 +1,10 @@
 import api from '../lib/api';
 
+/** Subscribe an email to the daily travel newsletter (POST /mail/subscribe). */
+export async function subscribeNewsletter(email: string): Promise<void> {
+  await api.post('/mail/subscribe', { email });
+}
+
 export interface TravelIntel {
   weather?: { temp?: number; rain?: number; wind?: number; uv?: number; humidity?: number; description?: string };
   crowdLevel?: string;

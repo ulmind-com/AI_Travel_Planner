@@ -24,6 +24,10 @@ import { AddExpenseScreen } from '../screens/expenses/AddExpenseScreen';
 import { BookingsScreen } from '../screens/expenses/BookingsScreen';
 import { ReviewsScreen } from '../screens/reviews/ReviewsScreen';
 import { TravelIntelScreen } from '../screens/intel/TravelIntelScreen';
+import { HelpScreen } from '../screens/info/HelpScreen';
+import { AboutScreen } from '../screens/info/AboutScreen';
+import { ContactScreen } from '../screens/info/ContactScreen';
+import { LegalScreen } from '../screens/info/LegalScreen';
 import type { MainStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -75,6 +79,10 @@ export function MainNavigator() {
       <Stack.Screen name="Bookings" component={BookingsScreen} />
       <Stack.Screen name="Reviews" component={ReviewsScreen} />
       <Stack.Screen name="TravelIntel" component={TravelIntelScreen} />
+      <Stack.Screen name="Help" component={HelpScreen} />
+      <Stack.Screen name="About" component={AboutScreen} />
+      <Stack.Screen name="Contact" component={ContactScreen} />
+      <Stack.Screen name="Legal" component={LegalScreen} />
     </Stack.Navigator>
   );
 }

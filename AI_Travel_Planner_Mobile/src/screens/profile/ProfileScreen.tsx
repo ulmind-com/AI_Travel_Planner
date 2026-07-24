@@ -5,9 +5,13 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Bell,
   ChevronRight,
+  FileText,
+  HelpCircle,
+  Info,
+  Lock,
   Compass,
-  CreditCard,
   LogOut,
+  Mail,
   MessageCircle,
   Pencil,
   Ticket,
@@ -59,6 +63,14 @@ export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
     { key: 'safety', label: 'Safety center', icon: Shield, tint: colors.coral, go: () => navigation.navigate('Safety') },
     { key: 'reviews', label: 'Reviews', icon: Star, tint: colors.gold, go: () => navigation.navigate('Reviews') },
     { key: 'notifications', label: 'Notifications', icon: Bell, tint: colors.gold, go: () => navigation.navigate('Notifications') },
+  ];
+
+  const SUPPORT: { key: string; label: string; icon: any; go: () => void }[] = [
+    { key: 'help', label: 'Help & FAQ', icon: HelpCircle, go: () => navigation.navigate('Help') },
+    { key: 'about', label: 'About', icon: Info, go: () => navigation.navigate('About') },
+    { key: 'contact', label: 'Contact us', icon: Mail, go: () => navigation.navigate('Contact') },
+    { key: 'privacy', label: 'Privacy Policy', icon: Lock, go: () => navigation.navigate('Legal', { kind: 'privacy' }) },
+    { key: 'terms', label: 'Terms of Service', icon: FileText, go: () => navigation.navigate('Legal', { kind: 'terms' }) },
   ];
 
   return (
@@ -129,6 +141,29 @@ export function ProfileScreen({ navigation }: TabScreenProps<'Profile'>) {
                   onPress={m.go}>
                   <View style={[styles.rowIcon, { backgroundColor: m.tint + '1A' }]}>
                     <Icon size={20} color={m.tint} />
+                  </View>
+                  <AppText variant="title" style={{ flex: 1 }}>
+                    {m.label}
+                  </AppText>
+                  <ChevronRight size={20} color={colors.ink300} />
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <AppText variant="label" muted style={styles.sectionLabel}>
+            SUPPORT & LEGAL
+          </AppText>
+          <View style={styles.menu}>
+            {SUPPORT.map((m, i) => {
+              const Icon = m.icon;
+              return (
+                <Pressable
+                  key={m.key}
+                  style={[styles.row, i < SUPPORT.length - 1 && styles.rowBorder]}
+                  onPress={m.go}>
+                  <View style={[styles.rowIcon, { backgroundColor: colors.ink500 + '1A' }]}>
+                    <Icon size={20} color={colors.ink600} />
                   </View>
                   <AppText variant="title" style={{ flex: 1 }}>
                     {m.label}
@@ -240,4 +275,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerSoft,
   },
   version: { marginTop: spacing.xl },
+  sectionLabel: { marginTop: spacing.xl, marginBottom: spacing.sm, marginLeft: spacing.xl + 4, letterSpacing: 1 },
 });
