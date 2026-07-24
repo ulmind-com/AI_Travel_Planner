@@ -17,6 +17,16 @@ export async function getPostById(id: string): Promise<CommunityPost | null> {
   return (data?.data ?? null) as CommunityPost | null;
 }
 
+/** Comma-separated "japan, budget" -> JSON array string '["japan","budget"]' (backend JSON.parses tags). */
+function tagsToJson(tags?: string): string | undefined {
+  if (!tags) return undefined;
+  const arr = tags
+    .split(',')
+    .map(t => t.trim().replace(/^#/, ''))
+    .filter(Boolean);
+  return arr.length ? JSON.stringify(arr) : undefined;
+}
+
 export async function createPost(input: {
   title?: string;
   content: string;
@@ -28,10 +38,30 @@ export async function createPost(input: {
   appendIf(form, 'content', input.content);
   appendIf(form, 'title', input.title);
   appendIf(form, 'category', input.category);
-  appendIf(form, 'tags', input.tags);
+  appendIf(form, 'tags', tagsToJson(input.tags));
   (input.images ?? []).forEach(img => form.append('images', img as any));
   const { data } = await api.post('/community/posts', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return (data?.data ?? data) as CommunityPost;
+}
+
+/** Share a generated trip plan to the community feed (links the plan via tripId). */
+export async function sharePlanToCommunity(input: {
+  title: string;
+  content: string;
+  category?: string;
+  tripId: string;
+  imageUrl?: string;
+  tags?: string[];
+}): Promise<CommunityPost> {
+  const { data } = await api.post('/community/posts', {
+    title: input.title,
+    content: input.content,
+    category: input.category || 'Story',
+    tripId: input.tripId,
+    images: input.imageUrl ? [input.imageUrl] : undefined,
+    tags: input.tags?.length ? JSON.stringify(input.tags) : undefined,
   });
   return (data?.data ?? data) as CommunityPost;
 }

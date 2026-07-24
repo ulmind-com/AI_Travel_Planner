@@ -35,6 +35,7 @@ import { SmartImage } from '../../components/ui/SmartImage';
 import { colors } from '../../theme/colors';
 import { radius, shadow, spacing } from '../../theme';
 import { getDestinationImages, getSavedPlans, savePlan, unsavePlan } from '../../services/plansService';
+import { sharePlanToCommunity } from '../../services/communityService';
 import { cleanTitle } from '../../lib/text';
 import { tapMedium, notifySuccess } from '../../lib/haptics';
 import { apiErrorMessage } from '../../lib/api';
@@ -122,6 +123,36 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
     if (!plan._id || busy) return;
     tapMedium();
     saved ? unsaveMut.mutate() : saveMut.mutate();
+  };
+
+  // Share this generated plan to the community feed (links the plan via tripId).
+  const [shared, setShared] = useState(false);
+  const shareMut = useMutation({
+    mutationFn: () =>
+      sharePlanToCommunity({
+        title: `${title} — a ${plan.days ?? ''}-day trip`.replace(' -day', '-day'),
+        content:
+          plan.destination_overview ||
+          `Check out this AI-crafted trip to ${title}${plan.from ? ` from ${plan.from}` : ''}${
+            total ? `, around ${cur}${Math.round(total).toLocaleString()}` : ''
+          }.`,
+        category: 'Guide',
+        tripId: plan._id as string,
+        imageUrl: plan.image_url,
+        tags: (plan.perfect_for ?? plan.activities ?? []).slice(0, 4),
+      }),
+    onSuccess: () => {
+      setShared(true);
+      notifySuccess();
+      setMsg('Shared to the community feed');
+      queryClient.invalidateQueries({ queryKey: ['community-feed'] });
+    },
+    onError: e => setMsg(apiErrorMessage(e)),
+  });
+  const shareToCommunity = () => {
+    if (!plan._id || shared || shareMut.isPending) return;
+    tapMedium();
+    shareMut.mutate();
   };
 
   const bb = plan.budget_breakdown;
@@ -270,6 +301,29 @@ export function PlanDetailScreen({ navigation, route }: MainStackScreenProps<'Pl
                   </AppText>
                 </View>
               ))}
+            </View>
+          ) : null}
+
+          {/* Share to community */}
+          {plan._id ? (
+            <View style={styles.shareCard}>
+              <View style={styles.shareIcon}>
+                <Users size={20} color={colors.brand} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <AppText variant="bodyStrong">Loved this plan?</AppText>
+                <AppText variant="caption" muted>
+                  Share it with the community — get likes & tips.
+                </AppText>
+              </View>
+              <Pressable
+                style={[styles.shareCta, shared && styles.shareCtaDone]}
+                onPress={shareToCommunity}
+                disabled={shared || shareMut.isPending}>
+                <AppText variant="label" color={shared ? colors.success : colors.white}>
+                  {shareMut.isPending ? '…' : shared ? 'Shared' : 'Share'}
+                </AppText>
+              </Pressable>
             </View>
           ) : null}
 
@@ -661,6 +715,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     marginTop: spacing.lg,
   },
+  shareCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: spacing.xl,
+    marginTop: spacing.xl,
+    backgroundColor: colors.brandSoft,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+  },
+  shareIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shareCta: {
+    paddingHorizontal: 18,
+    height: 38,
+    borderRadius: radius.pill,
+    backgroundColor: colors.brand,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shareCtaDone: { backgroundColor: colors.greenSoft },
   tag: {
     backgroundColor: colors.brandSoft,
     paddingHorizontal: 12,
