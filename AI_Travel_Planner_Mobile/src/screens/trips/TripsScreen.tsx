@@ -46,7 +46,7 @@ export function TripsScreen({ navigation, route }: TabScreenProps<'Trips'>) {
         {/* Segmented control */}
         <View style={styles.segment}>
           {([
-            { key: 'all', label: `All${all.data ? ` · ${all.data.length}` : ''}` },
+            { key: 'all', label: `All plans${all.data ? ` · ${all.data.length}` : ''}` },
             { key: 'saved', label: `Saved${saved.data ? ` · ${saved.data.length}` : ''}` },
           ] as { key: View2; label: string }[]).map(t => {
             const on = view === t.key;
